@@ -8,6 +8,8 @@ program : (instr NEWLINE)* instr NEWLINE*
 instr   :   LD reg COMMA mem    #instrLD
         |   ST reg COMMA mem    #instrST
         |   MOV reg COMMA reg   #instrMOV
+        |   PSH reg             #instrPSH
+        |   POP reg             #instrPOP
         ;
 
 mem     :   address                     #memRel
@@ -32,6 +34,8 @@ number  :   DIGIT+
 LD  :   'LD';
 ST  :   'ST';
 MOV :   'MOV';
+PSH :   'PSH';
+POP :   'POP';
 
 
 COMMA:  ',';
