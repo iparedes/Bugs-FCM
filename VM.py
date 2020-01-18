@@ -27,7 +27,8 @@ PROTECTED=[
 # CH: Code Head first position of the loaded program
 # DS: Data Segment
 # SP: Stack Pointer
-REGS=['CS', 'CH', 'DS', 'PC', 'SP']
+# HP: Heap Pointer
+REGS=['CS', 'CH', 'DS', 'PC', 'SP', 'HP']
 
 
 class VM:
@@ -41,10 +42,11 @@ class VM:
         self.RegSymbols={}  # Dictionary: Key is the register symbol, Value is the index of the registers array
         self.Memory=[0]*self.MemSize
 
-        self._pcidx=REGS.index('PC') # Tries to accelerate access to PC
+        self._pcidx=REGS.index('PC') # Tries to accelerate access to registers
         self._csidx=REGS.index('CS')
         self._dsidx=REGS.index('DS')
-
+        self._spidx=REGS.index('SP')
+        self._hpidx=REGS.index('HP')
 
         # Populates protected memory
         for count,elem in enumerate(PROTECTED,0):
@@ -68,7 +70,9 @@ class VM:
         size=self.get_mem(self.ProtSymbols['PROTECTED'])
         self.set_reg('CS',size)
         # The Stack grows from the bottom of the memory upwards
-        self.set_reg('SP',self.MemSize-1)
+        # The SP points to the current head of the stack, so as initially there is nothing in the stack,
+        # it points outside the memory (MEMSIZE)
+        self.set_reg('SP',self.MemSize)
 
 
     def get_reg(self,idx):
@@ -110,6 +114,7 @@ class VM:
         Context={}
         Context['PROTECTED']=PROTECTED
         Context['REGISTERS']=self.RegSymbols
+        Context['HEAPSIZE']=0   # Size of the heap will be set during compilation
 
         C=Compiler(program, Context)
         length_prog=len(C.bytecode)
@@ -119,7 +124,9 @@ class VM:
 
         # Data Segement starts after the code segment (program+padding)
         cs=self.get_reg('CS')
-        self.set_reg('DS',cs+size_code_segment)
+        ds=cs+size_code_segment
+        self.set_reg('DS',ds)
+        self.set_reg('HP',Context['HEAPSIZE'])
 
         # Loads the program at the start of the code segment plus half the padding (Code Head)
         ch=int(cs+padding/2)
@@ -154,6 +161,32 @@ class VM:
         func=getattr(self,symb_op_code)
         func()
 
+    def _push(self,val):
+        # SP points to the current head, so first we make it grow
+        sp=self.get_reg(self._spidx)
+        hp=self.get_reg(self._hpidx)
+        ds=self.get_reg(self._dsidx)
+        # The stack grows upwards
+        sp-=1
+
+        if sp==ds+hp:
+            # the stack has reached the heap, so roll over
+            sp=self.MemSize-1
+
+        self.set_mem(sp,val)
+        self.set_reg('SP',sp)
+
+    def _pop(self):
+        sp=self.get_reg(self._spidx)
+        val=self.get_mem(sp)
+        sp+=1
+        if sp==self.MemSize:
+            # the stack goes beyond the bottom of the memory (maybe too many pops), it rolls over to the beginning
+            # of the stack segment (delimited by the end of the heap)
+            hp=self.get_reg(self._hpidx)
+            sp=hp
+        self.set_reg('SP',sp)
+
 
     def show_architecture(self):
         print("Memory size:",self.MemSize)
@@ -162,6 +195,14 @@ class VM:
         for r in self.RegSymbols.keys():
             print(r+': '+str(self.get_reg(r)),end=' ')
         print()
+
+    def show_memory(self,start=0,end=MEM_SIZE):
+        for i in range(start,end):
+            if i%8==0:
+                t='\n'+str(i)+': '
+                print(t.rjust(7),end='')
+            print(str(self.get_mem(i)).ljust(4),end=' ')
+
 
 
     # ld1 reg addr
@@ -250,3 +291,18 @@ class VM:
         reg2=self._get_pc()
         val=self.get_reg(reg2)
         self.set_reg(reg1,val)
+
+    # psh reg
+    # pushes the content of register to the stack
+    def _psh(self):
+        reg=self._get_pc()
+        val=self.get_reg(reg)
+        self._push(val)
+
+    # pop reg
+    # pops the head of the stack into register
+    def _pp(self):
+        reg=self._get_pc()
+        val=self._pop()
+        self.set_reg(reg,val)
+

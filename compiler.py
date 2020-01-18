@@ -1,5 +1,5 @@
 
-OP_CODES=["_ld1","_ld2","_ld3","_ld4","_st1","_st2","_st3","_st4","_mov"]
+OP_CODES=["_ld1","_ld2","_ld3","_ld4","_st1","_st2","_st3","_st4","_mov","_psh","_pp"]
 
 """
 todo: INPUT and OUTPUT
@@ -101,3 +101,20 @@ class Compiler:
         reg2=self.program.pop(0)
         op_code=OP_CODES.index('_mov')
         return [op_code,reg1,reg2]
+
+    # Pushes the content of reg to the stack
+    # psh reg
+    def PSH(self):
+        self.program.pop(0)
+        reg=self.program.pop(0)
+        op_code=OP_CODES.index('_psh')
+        return [op_code, reg]
+
+
+    # Pops the head of the stack into reg
+    # pop reg
+    def POP(self):
+        self.program.pop(0)
+        reg=self.program.pop(0)
+        op_code=OP_CODES.index('_pop')
+        return [op_code, reg]

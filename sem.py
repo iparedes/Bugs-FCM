@@ -63,6 +63,24 @@ class Sem(mvasmListener):
     def exitInstrMOV(self, ctx:mvasmParser.InstrMOVContext):
         pass
 
+    # Enter a parse tree produced by mvasmParser#instrPSH.
+    def enterInstrPSH(self, ctx:mvasmParser.InstrPSHContext):
+        logger.debug(ctx.getText())
+        self.add("PSH")
+
+    # Exit a parse tree produced by mvasmParser#instrPSH.
+    def exitInstrPSH(self, ctx:mvasmParser.InstrPSHContext):
+        pass
+
+    # Enter a parse tree produced by mvasmParser#instrPOP.
+    def enterInstrPOP(self, ctx:mvasmParser.InstrPOPContext):
+        logger.debug(ctx.getText())
+        self.add("POP")
+
+    # Exit a parse tree produced by mvasmParser#instrPOP.
+    def exitInstrPOP(self, ctx:mvasmParser.InstrPOPContext):
+        pass
+
     # Enter a parse tree produced by mvasmParser#reg.
     def enterReg(self, ctx:mvasmParser.RegContext):
         pass

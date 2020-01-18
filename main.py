@@ -23,8 +23,8 @@ from VM import *
 # F.update_concepts_values()
 # print(F.Concepts['values'])
 
-
-stream = antlr4.InputStream("LD R1,{200}\nST R1,1")
+stream=FileStream("test.asm")
+#stream = antlr4.InputStream("LD R1,{200}\nST R1,1")
 C=Analyzer(stream)
 C.Walk()
 
@@ -36,6 +36,9 @@ M.step()
 M.show_architecture()
 M.step()
 M.show_architecture()
+M.step()
+M.show_architecture()
+M.show_memory()
 # a=M.get_reg('PC')
 
 pass

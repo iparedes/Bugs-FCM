@@ -44,6 +44,24 @@ class mvasmListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by mvasmParser#instrPSH.
+    def enterInstrPSH(self, ctx:mvasmParser.InstrPSHContext):
+        pass
+
+    # Exit a parse tree produced by mvasmParser#instrPSH.
+    def exitInstrPSH(self, ctx:mvasmParser.InstrPSHContext):
+        pass
+
+
+    # Enter a parse tree produced by mvasmParser#instrPOP.
+    def enterInstrPOP(self, ctx:mvasmParser.InstrPOPContext):
+        pass
+
+    # Exit a parse tree produced by mvasmParser#instrPOP.
+    def exitInstrPOP(self, ctx:mvasmParser.InstrPOPContext):
+        pass
+
+
     # Enter a parse tree produced by mvasmParser#memRel.
     def enterMemRel(self, ctx:mvasmParser.MemRelContext):
         pass
