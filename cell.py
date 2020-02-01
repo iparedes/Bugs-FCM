@@ -1,15 +1,49 @@
-
+import random
+from taxicab import TCPos
 
 DIRS=['N','E','S','W']
+SHIFTS=[[-1,0],[0,1],[1,0],[0,-1]]
 ANTA={'N':'S','E':'W','S':'N','W':'E'}
+
+FOOD_RATE=0.5
+FOOD_THINGS_INDEX=1
 
 class cell:
 
     def __init__(self):
         # In order: N, W, E, S
         self.neighbors=[]
-        self.food=1
+        # Things are the different elements that there is in a cell
+        # things[1]=food
+        # things[2]=herbivores
+        # things[3]=carnivores
+        # todo: Need to create a way of typifying the different bugs
+        self.things=[]
+        for i in range(0,4):
+            self.things.append(None)
+        self.coord=None
 
+
+    def has_food(self):
+        return self.things[1]
+
+    def harvest(self):
+        a=self.things[1]
+        self.things[1]=None
+        return a
+
+    # Ret: a list of cells in the radius dist
+    def get_neighbors(self,dist):
+        if dist==0:
+            return [self]
+        else:
+            a=[self]+ \
+              self.neighbors[0].get_neighbors(dist-1)+ \
+              self.neighbors[1].get_neighbors(dist-1)+ \
+              self.neighbors[2].get_neighbors(dist-1)+ \
+              self.neighbors[3].get_neighbors(dist-1)
+            a=list(dict.fromkeys(a))
+            return a
 
 class board:
 
@@ -27,15 +61,20 @@ class board:
 
         # Just for testing
         cont=0
-        for r in range(0,self.height):
-            for c in range(0,self.width):
-                self.b[r][c].food=cont
-                cont+=1
+        # for r in range(0,self.height):
+        #     for c in range(0,self.width):
+        #         self.b[r][c].food=cont
+        #         cont+=1
 
-        shifts=self.von_neumann_pos(1)
+        #shifts=self.von_neumann_pos(1)
         for r in range(0,self.height):
             for c in range(0,self.width):
-                for n in shifts:
+                # Sows food
+                if random.random()>FOOD_RATE:
+                    self.b[r][c].things[FOOD_THINGS_INDEX]=1
+                # Adds the coord as a property
+                self.b[r][c].coord=TCPos(r,c)
+                for n in SHIFTS:
                     a=self.add_coords([r,c],n)
                     self.b[r][c].neighbors.append(self.get_cell(a))
 
@@ -96,7 +135,7 @@ class board:
 
     # row, column
     # return coordinates of neumann neighbours with dist 1
-    def neighbors(self,pos):
+    def inmediate_neighbors(self, pos):
         r=pos[0]
         c=pos[1]
         N=[]
@@ -133,8 +172,3 @@ class board:
         N.remove([0,0])
         return N
 
-
-
-B=board(3,3)
-a=B.von_neumann_pos(2)
-print(a)

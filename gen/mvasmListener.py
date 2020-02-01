@@ -62,6 +62,51 @@ class mvasmListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by mvasmParser#instrBug_Instr.
+    def enterInstrBug_Instr(self, ctx:mvasmParser.InstrBug_InstrContext):
+        pass
+
+    # Exit a parse tree produced by mvasmParser#instrBug_Instr.
+    def exitInstrBug_Instr(self, ctx:mvasmParser.InstrBug_InstrContext):
+        pass
+
+
+    # Enter a parse tree produced by mvasmParser#instrSRCF.
+    def enterInstrSRCF(self, ctx:mvasmParser.InstrSRCFContext):
+        pass
+
+    # Exit a parse tree produced by mvasmParser#instrSRCF.
+    def exitInstrSRCF(self, ctx:mvasmParser.InstrSRCFContext):
+        pass
+
+
+    # Enter a parse tree produced by mvasmParser#instrWLKT.
+    def enterInstrWLKT(self, ctx:mvasmParser.InstrWLKTContext):
+        pass
+
+    # Exit a parse tree produced by mvasmParser#instrWLKT.
+    def exitInstrWLKT(self, ctx:mvasmParser.InstrWLKTContext):
+        pass
+
+
+    # Enter a parse tree produced by mvasmParser#instrwlkW.
+    def enterInstrwlkW(self, ctx:mvasmParser.InstrwlkWContext):
+        pass
+
+    # Exit a parse tree produced by mvasmParser#instrwlkW.
+    def exitInstrwlkW(self, ctx:mvasmParser.InstrwlkWContext):
+        pass
+
+
+    # Enter a parse tree produced by mvasmParser#instrWLK.
+    def enterInstrWLK(self, ctx:mvasmParser.InstrWLKContext):
+        pass
+
+    # Exit a parse tree produced by mvasmParser#instrWLK.
+    def exitInstrWLK(self, ctx:mvasmParser.InstrWLKContext):
+        pass
+
+
     # Enter a parse tree produced by mvasmParser#memRel.
     def enterMemRel(self, ctx:mvasmParser.MemRelContext):
         pass

@@ -1,5 +1,8 @@
 from analyzer import *
 from VM import *
+from bug import *
+from cell import *
+
 
 
 
@@ -23,22 +26,32 @@ from VM import *
 # F.update_concepts_values()
 # print(F.Concepts['values'])
 
-stream=FileStream("test.asm")
-#stream = antlr4.InputStream("LD R1,{200}\nST R1,1")
-C=Analyzer(stream)
-C.Walk()
-
-M=VM()
-M.load(C.Context['program'])
-M.show_architecture()
-M.set_mem(200,999)
-M.step()
-M.show_architecture()
-M.step()
-M.show_architecture()
-M.step()
-M.show_architecture()
-M.show_memory()
+# stream=FileStream("test.asm")
+# #stream = antlr4.InputStream("LD R1,{200}\nST R1,1")
+# C=Analyzer(stream)
+# C.Walk()
+#
+# M=VM()
+# M.load(C.Context['program'])
+# M.show_architecture()
+# M.set_mem(200,999)
+# M.step()
+# M.show_architecture()
+# M.step()
+# M.show_architecture()
+# M.step()
+# M.show_architecture()
+# M.show_memory()
 # a=M.get_reg('PC')
+
+#b=Bug()
+
+B=board(10,10)
+C=B.b[4][4]
+
+l=C.get_neighbors(2)
+for i in l:
+    print(i.coord)
+
 
 pass

@@ -10,7 +10,14 @@ instr   :   LD reg COMMA mem    #instrLD
         |   MOV reg COMMA reg   #instrMOV
         |   PSH reg             #instrPSH
         |   POP reg             #instrPOP
+        |   bug_instr           #instrBug_Instr
         ;
+
+bug_instr   :   SRCF             #instrSRCF
+            |   WLKT             #instrWLKT
+            |   WLKW             #instrwlkW
+            |   WLK reg          #instrWLK
+            ;
 
 mem     :   address                     #memRel
         |   OBRACE address CBRACE       #memAbs
@@ -36,6 +43,10 @@ ST  :   'ST';
 MOV :   'MOV';
 PSH :   'PSH';
 POP :   'POP';
+SRCF:   'SRCF';
+WLKT:   'WLKT';
+WLKW:   'WLKW';
+WLK :   'WLK';
 
 
 COMMA:  ',';
