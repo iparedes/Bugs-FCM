@@ -107,6 +107,24 @@ class mvasmListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by mvasmParser#valmem.
+    def enterValmem(self, ctx:mvasmParser.ValmemContext):
+        pass
+
+    # Exit a parse tree produced by mvasmParser#valmem.
+    def exitValmem(self, ctx:mvasmParser.ValmemContext):
+        pass
+
+
+    # Enter a parse tree produced by mvasmParser#valnumber.
+    def enterValnumber(self, ctx:mvasmParser.ValnumberContext):
+        pass
+
+    # Exit a parse tree produced by mvasmParser#valnumber.
+    def exitValnumber(self, ctx:mvasmParser.ValnumberContext):
+        pass
+
+
     # Enter a parse tree produced by mvasmParser#memRel.
     def enterMemRel(self, ctx:mvasmParser.MemRelContext):
         pass
@@ -134,6 +152,24 @@ class mvasmListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by mvasmParser#reg.
+    def enterReg(self, ctx:mvasmParser.RegContext):
+        pass
+
+    # Exit a parse tree produced by mvasmParser#reg.
+    def exitReg(self, ctx:mvasmParser.RegContext):
+        pass
+
+
+    # Enter a parse tree produced by mvasmParser#wrt_reg.
+    def enterWrt_reg(self, ctx:mvasmParser.Wrt_regContext):
+        pass
+
+    # Exit a parse tree produced by mvasmParser#wrt_reg.
+    def exitWrt_reg(self, ctx:mvasmParser.Wrt_regContext):
+        pass
+
+
     # Enter a parse tree produced by mvasmParser#gen_reg.
     def enterGen_reg(self, ctx:mvasmParser.Gen_regContext):
         pass
@@ -143,12 +179,12 @@ class mvasmListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by mvasmParser#reg.
-    def enterReg(self, ctx:mvasmParser.RegContext):
+    # Enter a parse tree produced by mvasmParser#prt_reg.
+    def enterPrt_reg(self, ctx:mvasmParser.Prt_regContext):
         pass
 
-    # Exit a parse tree produced by mvasmParser#reg.
-    def exitReg(self, ctx:mvasmParser.RegContext):
+    # Exit a parse tree produced by mvasmParser#prt_reg.
+    def exitPrt_reg(self, ctx:mvasmParser.Prt_regContext):
         pass
 
 

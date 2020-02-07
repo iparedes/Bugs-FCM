@@ -3,6 +3,9 @@ from VM import *
 
 SEARCH_RADIUS=1
 
+# Coded in four lower bits WSEN
+CODE_DIRS={'N':1,'E':2,'S':4,'W':8}
+
 class Bug(VM):
 
     """Let's talk about the capability of finding food and moving towards it. This probably means that there are other
@@ -22,15 +25,17 @@ class Bug(VM):
 
 
     def __init__(self,cell=None):
-        VM.__init__(self)
 
         # Add bug registers
         # SRR: Search radius. Determines the field of vision of the bug
         # SRF: Search for. Holds the type of item to search for (1:food)
         # DRS: Holds the result of the search operation. It codifies the directions where the items were found
-        #       in the four lower bits WSEN
-        nr=['SRR,''SRF','DRS']
+        #       in the five lower bits CWSEN (C is Center)
+        nr=['SRR','SRF','DRS']
+        global REGS
         REGS+=nr
+
+        VM.__init__(self)
 
         self._srridx=REGS.index('SRR')
         self._srfidx=REGS.index('SRF')
@@ -43,13 +48,24 @@ class Bug(VM):
         self.MyCell=cell
 
 
-    def _srf(self):
+    # DRS codes directions in the five lower bits. CWSEN (C is Center)
+    def _srcf(self):
         radius=self.get_reg(self._srridx)
         item_type=self.get_reg(self._srfidx)
         # Gets list of cells in the view radius
         cells_in_radius=self.MyCell.get_neighbors(radius)
         cells_with_item=[c for c in cells_in_radius if c.things[item_type]]
-        pass
+        dirs=[]
+        for c in cells_with_item:
+            if c==self.MyCell:
+                dirs+=['C']
+            else:
+                dirs+=self.MyCell.dirs_to(c)
+        dirs=list(set(dirs))
+        drs=0
+        for d in dirs:
+            drs+=CODE_DIRS[d]
+        self.set_reg('DRS',drs)
 
     def _wlkt(self):
         pass

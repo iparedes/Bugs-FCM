@@ -1,5 +1,6 @@
 
 
-ST  DS,{200}
-LD  R1,{200}
-PSH R1
+
+
+LD SRF,(1)
+SRCF

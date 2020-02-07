@@ -244,6 +244,13 @@ class VM:
         val=self.get_mem(addr)
         self.set_reg(reg1,val)
 
+    # Loads in reg1 a numeric value
+    def _ld5(self):
+        reg1=self._get_pc()
+        val=self._get_pc()
+        self.set_reg(reg1,val)
+
+
     # st1 reg addr
     # stores in addr (relative to DS) the value in reg
     def _st1(self):

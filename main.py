@@ -46,12 +46,20 @@ from cell import *
 
 #b=Bug()
 
+stream=FileStream("test.asm")
+#stream = antlr4.InputStream("LD R1,{200}\nST R1,1")
+analyzer=Analyzer(stream)
+analyzer.Walk()
+
 B=board(10,10)
 C=B.b[4][4]
 
-l=C.get_neighbors(2)
-for i in l:
-    print(i.coord)
+b=Bug(C)
+b.load(analyzer.Context['program'])
+b.step()
+b.show_architecture()
+b.step()
+b.show_architecture()
 
 
 pass

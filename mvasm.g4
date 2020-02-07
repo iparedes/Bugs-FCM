@@ -5,12 +5,12 @@ program : (instr NEWLINE)* instr NEWLINE*
         ;
 
 
-instr   :   LD reg COMMA mem    #instrLD
-        |   ST reg COMMA mem    #instrST
-        |   MOV reg COMMA reg   #instrMOV
-        |   PSH reg             #instrPSH
-        |   POP reg             #instrPOP
-        |   bug_instr           #instrBug_Instr
+instr   :   LD wrt_reg COMMA val    #instrLD
+        |   ST reg COMMA mem        #instrST
+        |   MOV reg COMMA reg       #instrMOV
+        |   PSH reg                 #instrPSH
+        |   POP reg                 #instrPOP
+        |   bug_instr               #instrBug_Instr
         ;
 
 bug_instr   :   SRCF             #instrSRCF
@@ -19,19 +19,28 @@ bug_instr   :   SRCF             #instrSRCF
             |   WLK reg          #instrWLK
             ;
 
+val     :   mem                  #valmem
+        |   OPAR number CPAR     #valnumber
+        ;
+
 mem     :   address                     #memRel
         |   OBRACE address CBRACE       #memAbs
         ;
 
 address :   number
-        |   gen_reg
+        |   reg
+        ;
+
+reg     :   wrt_reg | prt_reg ;
+
+wrt_reg :   gen_reg
+        |   SRF
         ;
 
 gen_reg     : 'R' DIGIT+
         ;
 
-reg     :   gen_reg
-        |   'CS' | 'CH' | 'DS' | 'PC' | 'SP'
+prt_reg :   'CS' | 'CH' | 'DS' | 'PC' | 'SP' | 'SRR' | 'DRS'
         ;
 
 
@@ -47,6 +56,7 @@ SRCF:   'SRCF';
 WLKT:   'WLKT';
 WLKW:   'WLKW';
 WLK :   'WLK';
+SRF :   'SRF';
 
 
 COMMA:  ',';

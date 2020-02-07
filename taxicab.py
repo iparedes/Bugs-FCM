@@ -2,15 +2,15 @@
 
 class TCPos:
 
-    def __init__(self,f,c):
+    def __init__(self,r,c):
         # rows and columns
-        self.f=f
+        self.r=r
         self.c=c
 
 
     # Returns taxicab distance to other position
     def dist(self,pos):
-        return abs(self.f-pos.f)+abs(self.c-pos.c)
+        return abs(self.r - pos.r) + abs(self.c - pos.c)
 
     # Returns a list with the directions that may be followed to reach another position
     # If the list is [0] means that destination is same as origin
@@ -18,7 +18,7 @@ class TCPos:
     #  402
     #   3
     def dir_to(self,pos):
-        vectf=pos.f-self.f
+        vectf=pos.r-self.r
         vectc=pos.c-self.c
         ret=[]
 
@@ -39,23 +39,26 @@ class TCPos:
     # Moves the position towards the specified direction
     def mov_to(self,dir):
         if dir==1:
-            self.f-=1
+            self.r-=1
         elif dir==2:
             self.c+=1
         elif dir==3:
-            self.f+=1
+            self.r+=1
         elif dir==4:
             self.c-=1
 
 
     def print(self):
-        print('('+str(self.f)+','+str(self.c)+')')
+        print('(' + str(self.r) + ',' + str(self.c) + ')')
 
     def __add__(self, other):
-        return TCPos(self.f + other.f, self.c + other.c)
+        return TCPos(self.r + other.r, self.c + other.c)
+
+    def __sub__(self, other):
+        return (TCPos(self.r - other.r, self.c - other.c))
 
     def __str__(self):
-        return "("+str(self.f)+","+str(self.c)+")"
+        return "(" + str(self.r) + "," + str(self.c) + ")"
 
 
 

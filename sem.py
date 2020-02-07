@@ -87,11 +87,23 @@ class Sem(mvasmListener):
 
     # Exit a parse tree produced by mvasmParser#reg.
     def exitReg(self, ctx:mvasmParser.RegContext):
+        logger.debug(ctx.getText())
         reg=ctx.getText()
         logger.debug(reg)
         self.add('REG')
         self.add(reg)
 
+    # Enter a parse tree produced by mvasmParser#wrt_reg.
+    def enterWrt_reg(self, ctx:mvasmParser.Wrt_regContext):
+        pass
+
+    # Exit a parse tree produced by mvasmParser#wrt_reg.
+    def exitWrt_reg(self, ctx:mvasmParser.Wrt_regContext):
+        logger.debug(ctx.getText())
+        reg=ctx.getText()
+        logger.debug(reg)
+        self.add('REG')
+        self.add(reg)
 
 
     # Enter a parse tree produced by mvasmParser#mem.
@@ -124,3 +136,83 @@ class Sem(mvasmListener):
         self.add(addr)
 
 
+    # Enter a parse tree produced by mvasmParser#instrBug_Instr.
+    def enterInstrBug_Instr(self, ctx:mvasmParser.InstrBug_InstrContext):
+        pass
+
+    # Exit a parse tree produced by mvasmParser#instrBug_Instr.
+    def exitInstrBug_Instr(self, ctx:mvasmParser.InstrBug_InstrContext):
+        pass
+
+
+    # Enter a parse tree produced by mvasmParser#instrSRCF.
+    def enterInstrSRCF(self, ctx:mvasmParser.InstrSRCFContext):
+        logger.debug(ctx.getText())
+        self.add("SRCF")
+
+    # Exit a parse tree produced by mvasmParser#instrSRCF.
+    def exitInstrSRCF(self, ctx:mvasmParser.InstrSRCFContext):
+        pass
+
+
+    # Enter a parse tree produced by mvasmParser#instrWLKT.
+    def enterInstrWLKT(self, ctx:mvasmParser.InstrWLKTContext):
+        ogger.debug(ctx.getText())
+        self.add("WLKT")
+
+
+    # Exit a parse tree produced by mvasmParser#instrWLKT.
+    def exitInstrWLKT(self, ctx:mvasmParser.InstrWLKTContext):
+        pass
+
+
+    # Enter a parse tree produced by mvasmParser#instrwlkW.
+    def enterInstrwlkW(self, ctx:mvasmParser.InstrwlkWContext):
+        logger.debug(ctx.getText())
+        self.add("WLKw")
+
+
+    # Exit a parse tree produced by mvasmParser#instrwlkW.
+    def exitInstrwlkW(self, ctx:mvasmParser.InstrwlkWContext):
+        pass
+
+
+    # Enter a parse tree produced by mvasmParser#instrWLK.
+    def enterInstrWLK(self, ctx:mvasmParser.InstrWLKContext):
+        logger.debug(ctx.getText())
+        self.add("WLK")
+
+
+    # Exit a parse tree produced by mvasmParser#instrWLK.
+    def exitInstrWLK(self, ctx:mvasmParser.InstrWLKContext):
+        pass
+
+
+    # Enter a parse tree produced by mvasmParser#valmem.
+    def enterValmem(self, ctx:mvasmParser.ValmemContext):
+        pass
+
+    # Exit a parse tree produced by mvasmParser#valmem.
+    def exitValmem(self, ctx:mvasmParser.ValmemContext):
+        pass
+
+
+    # Enter a parse tree produced by mvasmParser#valnumber.
+    def enterValnumber(self, ctx:mvasmParser.ValnumberContext):
+        logger.debug(ctx.getText())
+        self.add('VAL')
+
+
+    # Exit a parse tree produced by mvasmParser#valnumber.
+    def exitValnumber(self, ctx:mvasmParser.ValnumberContext):
+        pass
+
+    # Enter a parse tree produced by mvasmParser#number.
+    def enterNumber(self, ctx:mvasmParser.NumberContext):
+        pass
+
+    # Exit a parse tree produced by mvasmParser#number.
+    def exitNumber(self, ctx:mvasmParser.NumberContext):
+        logger.debug(ctx.getText())
+        number=int(ctx.getText())
+        self.add(number)

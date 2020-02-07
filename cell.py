@@ -5,6 +5,7 @@ DIRS=['N','E','S','W']
 SHIFTS=[[-1,0],[0,1],[1,0],[0,-1]]
 ANTA={'N':'S','E':'W','S':'N','W':'E'}
 
+
 FOOD_RATE=0.5
 FOOD_THINGS_INDEX=1
 
@@ -22,7 +23,6 @@ class cell:
         for i in range(0,4):
             self.things.append(None)
         self.coord=None
-
 
     def has_food(self):
         return self.things[1]
@@ -44,6 +44,20 @@ class cell:
               self.neighbors[3].get_neighbors(dist-1)
             a=list(dict.fromkeys(a))
             return a
+
+    # Ret: A list of directions of the first step to reach cell using the shortest path
+    def dirs_to(self,cell):
+        s=self.coord-cell.coord
+        dirs=[]
+        if s.r>0:
+            dirs.append('N')
+        elif s.r<0:
+            dirs.append('S')
+        if s.c>0:
+            dirs.append('E')
+        elif s.c<0:
+            dirs.append('W')
+        return dirs
 
 class board:
 

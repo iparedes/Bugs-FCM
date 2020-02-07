@@ -1,10 +1,20 @@
 
-OP_CODES=["_ld1","_ld2","_ld3","_ld4","_st1","_st2","_st3","_st4","_mov","_psh","_pp"]
+OP_CODES=["_ld1","_ld2","_ld3","_ld4","_ld5","_st1","_st2","_st3","_st4",
+          "_mov","_psh","_pp",'_srcf','_wlkt','_wlkw','_wlk']
 
 """
 todo: INPUT and OUTPUT
 """
 
+"""
+
+LD get_reg, val
+    Loads val into a writable register
+    val can be:
+        content of relative memory address
+        content of an absolute { memory address }
+        a ( numeric_value )
+"""
 
 
 class Compiler:
@@ -32,6 +42,7 @@ class Compiler:
     ld2: reg, rel_reg
     ld3: reg, abs_mem
     ld4: reg, abs_reg
+    ld5: reg, number
     """
     def LD(self):
         # First operand is a register
@@ -40,21 +51,28 @@ class Compiler:
         reg=self.program.pop(0)
         regidx=self.context['REGISTERS'][reg]
         type=self.program.pop(0)
-        op=self.program.pop(0)
-        val=self.program.pop(0)
         if type=='REL':
+            op=self.program.pop(0)
+            val=self.program.pop(0)
             if op=='ADDR':
                 # ld1
                 op_code='_ld1'
             else: # op=='REG'
                 # ld2
                 op_code='_ld2'
-        else:
+        elif type=='ABS':
+            op=self.program.pop(0)
+            val=self.program.pop(0)
             if op=='ADDR':
                 # ld3
                 op_code='_ld3'
             else: # op=='REG'
+                # ld4
                 op_code='_ld4'
+        else: # type=='VAL':
+            # ld5
+            val=self.program.pop(0)
+            op_code='_ld5'
         op_code=OP_CODES.index(op_code)
         return [op_code,regidx,val]
 
@@ -117,4 +135,23 @@ class Compiler:
         self.program.pop(0)
         reg=self.program.pop(0)
         op_code=OP_CODES.index('_pop')
+        return [op_code, reg]
+
+    def SRCF(self):
+        op_code=OP_CODES.index('_srcf')
+        return [op_code]
+
+    def WLKT(self):
+        op_code=OP_CODES.index('_wlkt')
+        return [op_code]
+
+
+    def WLKW(self):
+        op_code=OP_CODES.index('_wlkw')
+        return [op_code]
+
+    def WLK(self):
+        self.program.pop(0)
+        op_code=OP_CODES.index('_wlk')
+        reg=self.program.pop(0)
         return [op_code, reg]
