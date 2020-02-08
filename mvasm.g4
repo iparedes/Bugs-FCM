@@ -8,16 +8,17 @@ program : (instr NEWLINE)* instr NEWLINE*
 instr   :   LD wrt_reg COMMA val    #instrLD
         |   ST reg COMMA mem        #instrST
         |   MOV reg COMMA reg       #instrMOV
+        |   ADD wrt_reg COMMA reg   #instrADD
         |   PSH reg                 #instrPSH
         |   POP reg                 #instrPOP
-        |   bug_instr               #instrBug_Instr
+        |   JMP VARIABLE            #instrJMP
+        |   SRCF                    #instrSRCF
+        |   WLKT                    #instrWLKT
+        |   WLKW                    #instrwlkW
+        |   WLK reg                 #instrWLK
+        |   END                     #instrEnd
+        |   VARIABLE COLON          #instrLabel
         ;
-
-bug_instr   :   SRCF             #instrSRCF
-            |   WLKT             #instrWLKT
-            |   WLKW             #instrwlkW
-            |   WLK reg          #instrWLK
-            ;
 
 val     :   mem                  #valmem
         |   OPAR number CPAR     #valnumber
@@ -33,40 +34,44 @@ address :   number
 
 reg     :   wrt_reg | prt_reg ;
 
-wrt_reg :   gen_reg
-        |   SRF
+
+gen_reg : 'R1' | 'R2'| 'R3'| 'R4'| 'R5'| 'R6'| 'R7'| 'R8'| 'R9'
         ;
 
-gen_reg     : 'R' DIGIT+
+wrt_reg :   gen_reg | 'SRF'
         ;
 
-prt_reg :   'CS' | 'CH' | 'DS' | 'PC' | 'SP' | 'SRR' | 'DRS'
+prt_reg : 'CS' | 'CH' | 'DS' | 'PC' | 'SP' | 'SRR' | 'DRS' | 'NRG' | 'STM'
         ;
-
 
 number  :   DIGIT+
         ;
 
+ADD :   'ADD';
+END :   'END';
+JMP :   'JMP';
 LD  :   'LD';
-ST  :   'ST';
 MOV :   'MOV';
-PSH :   'PSH';
 POP :   'POP';
+PSH :   'PSH';
 SRCF:   'SRCF';
+ST  :   'ST';
+WLK :   'WLK';
 WLKT:   'WLKT';
 WLKW:   'WLKW';
-WLK :   'WLK';
-SRF :   'SRF';
 
+COMMA   :   ',';
+OPAR    :   '(';
+CPAR    :   ')';
+OBRACE  :   '{';
+CBRACE  :   '}';
+COLON   :   ':';
+DIGIT   :   [0-9];
 
-COMMA:  ',';
-OPAR:   '(';
-CPAR:   ')';
-OBRACE:   '{';
-CBRACE:   '}';
-DIGIT   : [0-9];
 NEWLINE   : '\r' '\n' | '\n' | '\r';
 
+VARIABLE    :   [a-zA-Z][a-zA-Z0-9]*
+            ;
 WS
    : [ \r\n] + -> skip
    ;

@@ -1,4 +1,7 @@
+import logging
+logger = logging.getLogger(__name__)
 from compiler import *
+
 
 """
 Keep it simple
@@ -9,7 +12,7 @@ MEM_SIZE=256        # Size of memory block
 PROTECTED_SIZE=20   # Protected memory cannot be modified using code, just by mutation
 GEN_REGS=8          # Number of general purpose registers
 CODE_PADDING=10     # Percentage of memory extra-allocated to the Code Segment. The size of the code segment is defined
-                    # by de loaded program, but we put some extra space to not let the code very tight
+                    # by the loaded program, but we put some extra space to not let the code very tight
 
 # Description of protected memory cells (only for the initial VM)
 # These cells are the first positions of memory
@@ -32,7 +35,6 @@ REGS=['CS', 'CH', 'DS', 'PC', 'SP', 'HP']
 
 
 class VM:
-
     def __init__(self,memsize=MEM_SIZE):
         """The registers, internally are representated by numbers, 0 is the first register in REGS,
         """
@@ -75,6 +77,35 @@ class VM:
         self.set_reg('SP',self.MemSize)
 
 
+
+    def load(self,program):
+
+        Context={}
+        Context['PROTECTED']=PROTECTED
+        Context['REGISTERS']=self.RegSymbols
+        Context['HEAPSIZE']=0   # Size of the heap will be set during compilation
+
+        C=Compiler(program, Context)
+        length_prog=len(C.bytecode)
+        paddingpct=self.get_mem(self.ProtSymbols['CODEPADDING'])
+        padding=int(length_prog*(paddingpct/100))
+        size_code_segment=round(length_prog*(1+(padding/100)))
+
+        # Data Segement starts after the code segment (program+padding)
+        cs=self.get_reg('CS')
+        ds=cs+size_code_segment
+        self.set_reg('DS',ds)
+        self.set_reg('HP',Context['HEAPSIZE'])
+
+        # Loads the program at the start of the code segment plus half the padding (Code Head)
+        ch=int(cs+padding/2)
+        self.set_mem_blk(ch,C.bytecode)
+        # Sets the Code Header relative to CS (probably will be used by a RST function)
+        ch-=cs
+        self.set_reg('CH',ch)
+        # And initializes the PC relative to CS
+        self.set_reg('PC',ch)
+
     def get_reg(self,idx):
         # Look at this!!
         # Expects access to the regs by index mostly, but if gets the symbolic name catches the exception and acts
@@ -109,34 +140,6 @@ class VM:
             self.set_mem(cont,item)
             cont+=1
 
-    def load(self,program):
-
-        Context={}
-        Context['PROTECTED']=PROTECTED
-        Context['REGISTERS']=self.RegSymbols
-        Context['HEAPSIZE']=0   # Size of the heap will be set during compilation
-
-        C=Compiler(program, Context)
-        length_prog=len(C.bytecode)
-        paddingpct=self.get_mem(self.ProtSymbols['CODEPADDING'])
-        padding=int(length_prog*(paddingpct/100))
-        size_code_segment=round(length_prog*(1+(padding/100)))
-
-        # Data Segement starts after the code segment (program+padding)
-        cs=self.get_reg('CS')
-        ds=cs+size_code_segment
-        self.set_reg('DS',ds)
-        self.set_reg('HP',Context['HEAPSIZE'])
-
-        # Loads the program at the start of the code segment plus half the padding (Code Head)
-        ch=int(cs+padding/2)
-        self.set_mem_blk(ch,C.bytecode)
-        # Sets the Code Header relative to CS (probably will be used by a RST function)
-        ch-=cs
-        self.set_reg('CH',ch)
-        # And initializes the PC relative to CS
-        self.set_reg('PC',ch)
-
 
     def _get_pc(self):
         cs=self.get_reg(self._csidx)
@@ -155,11 +158,17 @@ class VM:
         return data
 
     # Runs the next instruction
+    # Returns 0 in case the instruction is END. 1 otherwise
     def step(self):
         op_code=self._get_pc()
         symb_op_code=OP_CODES[op_code]
+        logger.debug(symb_op_code)
         func=getattr(self,symb_op_code)
         func()
+        if symb_op_code=='_end':
+            return 0
+        else:
+            return 1
 
     def _push(self,val):
         # SP points to the current head, so first we make it grow
@@ -281,6 +290,14 @@ class VM:
         val=self.get_reg(reg)
         self.set_mem(addr,val)
 
+    def _add(self):
+        reg1=self._get_pc()
+        reg2=self._get_pc()
+        v1=self.get_reg(reg1)
+        v2=self.get_reg(reg2)
+        self.set_reg(reg1,v1+v2)
+
+
     # st4 reg1 {reg2}
     # stores in the address contained in reg2 (absoloute) the value of register reg1
     def _ld4(self):
@@ -313,3 +330,8 @@ class VM:
         val=self._pop()
         self.set_reg(reg,val)
 
+    # jump dir
+    # sets the PC to dir
+    def _jmp(self):
+        dir=self._get_pc()
+        self.set_reg(self._pcidx,dir)

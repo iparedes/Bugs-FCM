@@ -1,6 +1,6 @@
 
 OP_CODES=["_ld1","_ld2","_ld3","_ld4","_ld5","_st1","_st2","_st3","_st4",
-          "_mov","_psh","_pp",'_srcf','_wlkt','_wlkw','_wlk']
+          "_mov","_psh","_pp",'_srcf','_wlkt','_wlkw','_wlk','_jmp','_add','_end']
 
 """
 todo: INPUT and OUTPUT
@@ -22,7 +22,6 @@ class Compiler:
         self.program=list(prog)
         self.bytecode=[]
         self.context=context
-
 
         # todo: Needs to account for the code padding
         while self.program:
@@ -120,6 +119,19 @@ class Compiler:
         op_code=OP_CODES.index('_mov')
         return [op_code,reg1,reg2]
 
+    # Adds value of reg2 to reg1
+    # add wrt_reg1 ,reg2
+    def ADD(self):
+        # First operand is a register
+        # Extract the REG keyword and reads the reg index
+        self.program.pop(0)
+        reg1=self.program.pop(0)
+        # Second operand is also a register
+        self.program.pop(0)
+        reg2=self.program.pop(0)
+        op_code=OP_CODES.index('_add')
+        return [op_code, reg1, reg2]
+
     # Pushes the content of reg to the stack
     # psh reg
     def PSH(self):
@@ -155,3 +167,15 @@ class Compiler:
         op_code=OP_CODES.index('_wlk')
         reg=self.program.pop(0)
         return [op_code, reg]
+
+    def JMP(self):
+        op_code=OP_CODES.index('_jmp')
+        dir=self.program.pop(0)
+        return [op_code, dir]
+
+    def END(self):
+        op_code=OP_CODES.index('_end')
+        return [op_code]
+
+
+

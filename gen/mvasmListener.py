@@ -44,6 +44,15 @@ class mvasmListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by mvasmParser#instrADD.
+    def enterInstrADD(self, ctx:mvasmParser.InstrADDContext):
+        pass
+
+    # Exit a parse tree produced by mvasmParser#instrADD.
+    def exitInstrADD(self, ctx:mvasmParser.InstrADDContext):
+        pass
+
+
     # Enter a parse tree produced by mvasmParser#instrPSH.
     def enterInstrPSH(self, ctx:mvasmParser.InstrPSHContext):
         pass
@@ -62,12 +71,12 @@ class mvasmListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by mvasmParser#instrBug_Instr.
-    def enterInstrBug_Instr(self, ctx:mvasmParser.InstrBug_InstrContext):
+    # Enter a parse tree produced by mvasmParser#instrJMP.
+    def enterInstrJMP(self, ctx:mvasmParser.InstrJMPContext):
         pass
 
-    # Exit a parse tree produced by mvasmParser#instrBug_Instr.
-    def exitInstrBug_Instr(self, ctx:mvasmParser.InstrBug_InstrContext):
+    # Exit a parse tree produced by mvasmParser#instrJMP.
+    def exitInstrJMP(self, ctx:mvasmParser.InstrJMPContext):
         pass
 
 
@@ -104,6 +113,24 @@ class mvasmListener(ParseTreeListener):
 
     # Exit a parse tree produced by mvasmParser#instrWLK.
     def exitInstrWLK(self, ctx:mvasmParser.InstrWLKContext):
+        pass
+
+
+    # Enter a parse tree produced by mvasmParser#instrEnd.
+    def enterInstrEnd(self, ctx:mvasmParser.InstrEndContext):
+        pass
+
+    # Exit a parse tree produced by mvasmParser#instrEnd.
+    def exitInstrEnd(self, ctx:mvasmParser.InstrEndContext):
+        pass
+
+
+    # Enter a parse tree produced by mvasmParser#instrLabel.
+    def enterInstrLabel(self, ctx:mvasmParser.InstrLabelContext):
+        pass
+
+    # Exit a parse tree produced by mvasmParser#instrLabel.
+    def exitInstrLabel(self, ctx:mvasmParser.InstrLabelContext):
         pass
 
 
@@ -161,21 +188,21 @@ class mvasmListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by mvasmParser#wrt_reg.
-    def enterWrt_reg(self, ctx:mvasmParser.Wrt_regContext):
-        pass
-
-    # Exit a parse tree produced by mvasmParser#wrt_reg.
-    def exitWrt_reg(self, ctx:mvasmParser.Wrt_regContext):
-        pass
-
-
     # Enter a parse tree produced by mvasmParser#gen_reg.
     def enterGen_reg(self, ctx:mvasmParser.Gen_regContext):
         pass
 
     # Exit a parse tree produced by mvasmParser#gen_reg.
     def exitGen_reg(self, ctx:mvasmParser.Gen_regContext):
+        pass
+
+
+    # Enter a parse tree produced by mvasmParser#wrt_reg.
+    def enterWrt_reg(self, ctx:mvasmParser.Wrt_regContext):
+        pass
+
+    # Exit a parse tree produced by mvasmParser#wrt_reg.
+    def exitWrt_reg(self, ctx:mvasmParser.Wrt_regContext):
         pass
 
 

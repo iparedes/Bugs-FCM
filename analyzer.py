@@ -39,5 +39,5 @@ class Analyzer():
         seq=Sem(self.Context)
         self.Walker.walk(seq,self.Tree)
         # In the next we set stage to 2 and do the walk for the semantic analysis
-        #self.Context['stage']=2
-        #self.Walker.walk(seq,self.Tree)
+        self.Context['stage']=2
+        self.Walker.walk(seq,self.Tree)

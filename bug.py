@@ -2,9 +2,10 @@ from VM import *
 
 
 SEARCH_RADIUS=1
+STAMINA=5
 
-# Coded in four lower bits WSEN
-CODE_DIRS={'N':1,'E':2,'S':4,'W':8}
+# Coded in five lower bits CWSEN
+CODE_DIRS={'N':1,'E':2,'S':4,'W':8,'C':16}
 
 class Bug(VM):
 
@@ -31,7 +32,9 @@ class Bug(VM):
         # SRF: Search for. Holds the type of item to search for (1:food)
         # DRS: Holds the result of the search operation. It codifies the directions where the items were found
         #       in the five lower bits CWSEN (C is Center)
-        nr=['SRR','SRF','DRS']
+        # NRG: The energy level of the bug. Reduced by executing instructions, increased by food
+        # STM: Stamina. The number of instructions that can be executed by the bug in each cycle
+        nr=['SRR','SRF','DRS','NRG','STM']
         global REGS
         REGS+=nr
 
@@ -40,12 +43,23 @@ class Bug(VM):
         self._srridx=REGS.index('SRR')
         self._srfidx=REGS.index('SRF')
         self._drsidx=REGS.index('DRS')
+        self._nrgidx=REGS.index('NRG')
+        self._stmdix=REGS.index('STM')
 
         self.set_reg('SRR',SEARCH_RADIUS)
         self.set_reg('SRF',0)
         self.set_reg('DRS',0)
+        self.set_reg('STM',STAMINA)
 
         self.MyCell=cell
+
+
+    def cycle(self):
+        steps=self.get_reg(self._stmdix)
+        run=1
+        while steps and run:
+            run=self.step()
+            steps-=1
 
 
     # DRS codes directions in the five lower bits. CWSEN (C is Center)

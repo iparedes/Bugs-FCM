@@ -47,7 +47,7 @@ from cell import *
 #b=Bug()
 
 stream=FileStream("test.asm")
-#stream = antlr4.InputStream("LD R1,{200}\nST R1,1")
+#stream = antlr4.InputStream("ADD R1,R2\n")
 analyzer=Analyzer(stream)
 analyzer.Walk()
 
@@ -56,10 +56,8 @@ C=B.b[4][4]
 
 b=Bug(C)
 b.load(analyzer.Context['program'])
-b.step()
-b.show_architecture()
-b.step()
-b.show_architecture()
 
+b.cycle()
+b.show_architecture()
 
 pass
