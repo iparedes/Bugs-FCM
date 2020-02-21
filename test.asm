@@ -1,6 +1,8 @@
 LD R1,(90)
 LD R2,(5)
-init:
+MOV R3,R1
 ADD R1,R2
-JMP init
+NOP
+NOP
+JMPB 7
 END

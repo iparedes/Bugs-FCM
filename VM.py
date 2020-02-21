@@ -2,6 +2,8 @@ import logging
 logger = logging.getLogger(__name__)
 from compiler import *
 
+# todo: I am mixing absolute and relative addressing when using the PC. Load function returns absolute, while PC \
+# should be relative to the CS
 
 """
 Keep it simple
@@ -11,8 +13,8 @@ Keep it simple
 MEM_SIZE=256        # Size of memory block
 PROTECTED_SIZE=20   # Protected memory cannot be modified using code, just by mutation
 GEN_REGS=8          # Number of general purpose registers
-CODE_PADDING=10     # Percentage of memory extra-allocated to the Code Segment. The size of the code segment is defined
-                    # by the loaded program, but we put some extra space to not let the code very tight
+CODE_PCTG=0.25      # Percentage of memory extra-allocated to the Code Segment
+
 
 # Description of protected memory cells (only for the initial VM)
 # These cells are the first positions of memory
@@ -22,16 +24,15 @@ PROTECTED=[
     ('MEMSIZE',MEM_SIZE),
     ('PROTECTED',PROTECTED_SIZE),
     ('GENREGS',GEN_REGS),
-    ('CODEPADDING',CODE_PADDING)
+    ('CODEPCTG',CODE_PCTG)
 ]
 
 # CS: Code Segment. Starts after the protected area
 # PC: Program Counter. Points to the next instruction to execute
-# CH: Code Head first position of the loaded program
 # DS: Data Segment
 # SP: Stack Pointer
 # HP: Heap Pointer
-REGS=['CS', 'CH', 'DS', 'PC', 'SP', 'HP']
+REGS=['CS', 'DS', 'PC', 'SP', 'HP']
 
 
 class VM:
@@ -44,13 +45,15 @@ class VM:
         self.RegSymbols={}  # Dictionary: Key is the register symbol, Value is the index of the registers array
         self.Memory=[0]*self.MemSize
 
-        self._pcidx=REGS.index('PC') # Tries to accelerate access to registers
+        # Tries to accelerate access to registers
+        self._pcidx=REGS.index('PC')
         self._csidx=REGS.index('CS')
         self._dsidx=REGS.index('DS')
         self._spidx=REGS.index('SP')
         self._hpidx=REGS.index('HP')
 
         # Populates protected memory
+        # Creates Protsymbols to access the memory protected data by name
         for count,elem in enumerate(PROTECTED,0):
             self.Memory[count]=elem[1]
             self.Memory[count]=elem[1]
@@ -60,6 +63,7 @@ class VM:
         for count,elem in enumerate(REGS,0):
             self.RegSymbols[elem]=count
             self.Regs.append(0)
+
         # Continue populating with the general registers
         start=len(REGS)
         size=self.Memory[self.ProtSymbols['GENREGS']]
@@ -69,42 +73,92 @@ class VM:
 
         # Set some initial values
         # The Code Segment starts right after the protected area
-        size=self.get_mem(self.ProtSymbols['PROTECTED'])
-        self.set_reg('CS',size)
+        prot_size=self.get_mem(self.ProtSymbols['PROTECTED'])
+        self.set_reg('CS',prot_size)
+        # The code segment has a size determined as percentage of the non-protected memory
+        mem_size=self.get_mem(self.ProtSymbols['MEMSIZE'])
+        code_pctg=self.get_mem(self.ProtSymbols['CODEPCTG'])
+        code_size=int((mem_size-prot_size)*code_pctg)
+
+        # The Data Segment starts after the code segment, (the code segment starts right after protected area
+        self.set_reg('DS',prot_size+code_size)
+        # Initializes the Heap Pointer to the start of the Data Segment
+        self.set_reg('HP',prot_size+code_size)
         # The Stack grows from the bottom of the memory upwards
         # The SP points to the current head of the stack, so as initially there is nothing in the stack,
         # it points outside the memory (MEMSIZE)
         self.set_reg('SP',self.MemSize)
 
 
+    # Returns the absolute address of the next free cell from pos
+    def search_free_from(self,pos):
+        cs=self.get_reg('CS')
+        ds=self.get_reg('DS')
+        i=pos
+        v=self.get_mem(i)
+        while v!=0:
+            i+=1
+            if i==ds:
+                i=cs
+            if i==pos:
+                # No free mem
+                return 0
+        return i
+
+    # Returns the size of the free block that starts on pos
+    def size_of_block(self,pos):
+        cs=self.get_reg('CS')
+        ds=self.get_reg('DS')
+        i=pos
+        size=0
+        v=self.get_mem(i)
+        if v!=0:
+            return size
+        else:
+            while v==0 and i<(ds-1):
+                i+=1
+                size+=1
+                v=self.get_mem(i)
+            return size
+
+    # Returns list with free memory blocks (pos,size)
+    def find_blocks(self):
+        cs=self.get_reg('CS')
+        ds=self.get_reg('DS')
+        list=[]
+        pos=cs
+        while pos<(ds-1):
+            size=self.size_of_block(pos)
+            if size>0:
+                list.append((pos,size))
+                pos+=size
+            else:
+                pos+=1
+        # checks if there is a turnaround block
+        l=len(list)
+        if l>1:
+            first=list[0]
+            last=list[l-1]
+            end=last[0]+last[1]
+            if (first[0]==cs) and (end==(ds-1)):
+                list.pop()
+                list.pop(l-2)
+                list.append((last[0],last[1]+first[1]))
+        list.sort(key=lambda tup: tup[1])
+        return list
 
     def load(self,program):
-
         Context={}
-        Context['PROTECTED']=PROTECTED
         Context['REGISTERS']=self.RegSymbols
-        Context['HEAPSIZE']=0   # Size of the heap will be set during compilation
-
         C=Compiler(program, Context)
         length_prog=len(C.bytecode)
-        paddingpct=self.get_mem(self.ProtSymbols['CODEPADDING'])
-        padding=int(length_prog*(paddingpct/100))
-        size_code_segment=round(length_prog*(1+(padding/100)))
-
-        # Data Segement starts after the code segment (program+padding)
-        cs=self.get_reg('CS')
-        ds=cs+size_code_segment
-        self.set_reg('DS',ds)
-        self.set_reg('HP',Context['HEAPSIZE'])
-
-        # Loads the program at the start of the code segment plus half the padding (Code Head)
-        ch=int(cs+padding/2)
-        self.set_mem_blk(ch,C.bytecode)
-        # Sets the Code Header relative to CS (probably will be used by a RST function)
-        ch-=cs
-        self.set_reg('CH',ch)
-        # And initializes the PC relative to CS
-        self.set_reg('PC',ch)
+        blocks=self.find_blocks()
+        for b in blocks:
+            if b[1]>=length_prog:
+                pos=b[0]
+                self.set_mem_blk(pos,C.bytecode)
+                return pos
+        return 0
 
     def get_reg(self,idx):
         # Look at this!!
@@ -140,11 +194,12 @@ class VM:
             self.set_mem(cont,item)
             cont+=1
 
-
-    def _get_pc(self):
+    # PC is always absolute address
+    def _get_pc_code(self):
         cs=self.get_reg(self._csidx)
-        pcrel=self.get_reg(self._pcidx)
-        pcabs=pcrel+cs
+
+        pcabs=self.get_reg(self._pcidx)
+
         data=self.get_mem(pcabs)
         pcabs+=1
 
@@ -153,14 +208,26 @@ class VM:
         if pcabs==ds:
             pcabs=cs
 
-        pcrel=pcabs-cs
-        self.set_reg(self._pcidx,pcrel)
+        self.set_reg(self._pcidx,pcabs)
         return data
+
+    def _set_pc(self,dir):
+        cs=self.get_reg(self._csidx)
+        ds=self.get_reg(self._dsidx)
+        size=ds-cs
+
+        if dir>=ds:
+            dir=dir-size
+        elif dir<cs:
+            dir=dir+size
+
+        self.set_reg(self._pcidx,dir)
+
 
     # Runs the next instruction
     # Returns 0 in case the instruction is END. 1 otherwise
     def step(self):
-        op_code=self._get_pc()
+        op_code=self._get_pc_code()
         symb_op_code=OP_CODES[op_code]
         logger.debug(symb_op_code)
         func=getattr(self,symb_op_code)
@@ -217,8 +284,8 @@ class VM:
     # ld1 reg addr
     # loads in reg the value in addr relative to DS
     def _ld1(self):
-        reg=self._get_pc()
-        addr=self._get_pc()
+        reg=self._get_pc_code()
+        addr=self._get_pc_code()
         # Address is relative to DS
         addr+=self.get_reg('DS')
         val=self.get_mem(addr)
@@ -227,8 +294,8 @@ class VM:
     # ld2 reg1 reg2
     # loads in reg1 the value of the addr relative to DS stored in reg2
     def _ld2(self):
-        reg1=self._get_pc()
-        reg2=self._get_pc()
+        reg1=self._get_pc_code()
+        reg2=self._get_pc_code()
         addr=self.get_reg(reg2)
         # Address is relative to DS
         addr+=self.get_reg('DS')
@@ -239,33 +306,33 @@ class VM:
     # Loads in a register the content of an absolute memory address
     def _ld3(self):
         # When it gets here, the PC points to the target register
-        reg=self._get_pc()
-        addr=self._get_pc()
+        reg=self._get_pc_code()
+        addr=self._get_pc_code()
         val=self.get_mem(addr)
         self.set_reg(reg,val)
 
     # ld4 reg1 {reg2}
     # Loads in reg1 the content of the absolute memory address contained in reg2
     def _ld4(self):
-        reg1=self._get_pc()
-        reg2=self._get_pc()
+        reg1=self._get_pc_code()
+        reg2=self._get_pc_code()
         addr=self.get_reg(reg2)
         val=self.get_mem(addr)
         self.set_reg(reg1,val)
 
     # Loads in reg1 a numeric value
     def _ld5(self):
-        reg1=self._get_pc()
-        val=self._get_pc()
+        reg1=self._get_pc_code()
+        val=self._get_pc_code()
         self.set_reg(reg1,val)
 
 
     # st1 reg addr
     # stores in addr (relative to DS) the value in reg
     def _st1(self):
-        reg=self._get_pc()
+        reg=self._get_pc_code()
         val=self.get_reg(reg)
-        addr=self._get_pc()
+        addr=self._get_pc_code()
         # Address is relative to DS
         addr+=self.get_reg('DS')
         self.set_mem(addr,val)
@@ -273,10 +340,10 @@ class VM:
     # st2 reg1 reg2
     # stores in the address in reg2 (relative to DS) the value of reg1
     def _st2(self):
-        reg1=self._get_pc()
+        reg1=self._get_pc_code()
         val=self.get_reg(reg1)
 
-        reg2=self._get_pc()
+        reg2=self._get_pc_code()
         addr=self.get_reg(reg2)
         # Address is relative to DS
         addr+=self.get_reg('DS')
@@ -285,14 +352,14 @@ class VM:
     # st3 reg {addr}
     # Stores in absolute addr the content of register reg
     def _st3(self):
-        reg=self._get_pc()
-        addr=self._get_pc()
+        reg=self._get_pc_code()
+        addr=self._get_pc_code()
         val=self.get_reg(reg)
         self.set_mem(addr,val)
 
     def _add(self):
-        reg1=self._get_pc()
-        reg2=self._get_pc()
+        reg1=self._get_pc_code()
+        reg2=self._get_pc_code()
         v1=self.get_reg(reg1)
         v2=self.get_reg(reg2)
         self.set_reg(reg1,v1+v2)
@@ -301,8 +368,8 @@ class VM:
     # st4 reg1 {reg2}
     # stores in the address contained in reg2 (absoloute) the value of register reg1
     def _ld4(self):
-        reg1=self._get_pc()
-        reg2=self._get_pc()
+        reg1=self._get_pc_code()
+        reg2=self._get_pc_code()
         addr=self.get_reg(reg2)
         val=self.get_reg(reg1)
         self.set_mem(addr,val)
@@ -311,27 +378,48 @@ class VM:
     # mov reg1 reg2
     # copies content of reg2 to reg1
     def _mov(self):
-        reg1=self._get_pc()
-        reg2=self._get_pc()
+        reg1=self._get_pc_code()
+        reg2=self._get_pc_code()
         val=self.get_reg(reg2)
         self.set_reg(reg1,val)
 
     # psh reg
     # pushes the content of register to the stack
     def _psh(self):
-        reg=self._get_pc()
+        reg=self._get_pc_code()
         val=self.get_reg(reg)
         self._push(val)
 
     # pop reg
     # pops the head of the stack into register
     def _pp(self):
-        reg=self._get_pc()
+        reg=self._get_pc_code()
         val=self._pop()
         self.set_reg(reg,val)
 
-    # jump dir
+    # jmp dir
     # sets the PC to dir
     def _jmp(self):
-        dir=self._get_pc()
+        dir=self._get_pc_code()
         self.set_reg(self._pcidx,dir)
+
+    # jmpf val
+    # Jumps forward. Adds val to the PC
+    def _jmpf(self):
+        val=self._get_pc_code()
+        pc=self.get_reg(self._pcidx)
+        self._set_pc(pc+val)
+
+    # jmpb val
+    # Jumps backward. Substracts val from the PC
+    def _jmpb(self):
+        val=self._get_pc_code()
+        pc=self.get_reg(self._pcidx)
+        self._set_pc(pc-val)
+
+    def _nop(self):
+        pass
+
+    def _end(self):
+        pass
+

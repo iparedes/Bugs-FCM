@@ -80,6 +80,24 @@ class mvasmListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by mvasmParser#instrJMPF.
+    def enterInstrJMPF(self, ctx:mvasmParser.InstrJMPFContext):
+        pass
+
+    # Exit a parse tree produced by mvasmParser#instrJMPF.
+    def exitInstrJMPF(self, ctx:mvasmParser.InstrJMPFContext):
+        pass
+
+
+    # Enter a parse tree produced by mvasmParser#instrJMPB.
+    def enterInstrJMPB(self, ctx:mvasmParser.InstrJMPBContext):
+        pass
+
+    # Exit a parse tree produced by mvasmParser#instrJMPB.
+    def exitInstrJMPB(self, ctx:mvasmParser.InstrJMPBContext):
+        pass
+
+
     # Enter a parse tree produced by mvasmParser#instrSRCF.
     def enterInstrSRCF(self, ctx:mvasmParser.InstrSRCFContext):
         pass
@@ -122,6 +140,15 @@ class mvasmListener(ParseTreeListener):
 
     # Exit a parse tree produced by mvasmParser#instrEnd.
     def exitInstrEnd(self, ctx:mvasmParser.InstrEndContext):
+        pass
+
+
+    # Enter a parse tree produced by mvasmParser#instrNOP.
+    def enterInstrNOP(self, ctx:mvasmParser.InstrNOPContext):
+        pass
+
+    # Exit a parse tree produced by mvasmParser#instrNOP.
+    def exitInstrNOP(self, ctx:mvasmParser.InstrNOPContext):
         pass
 
 

@@ -2,7 +2,7 @@ from VM import *
 
 
 SEARCH_RADIUS=1
-STAMINA=5
+STAMINA=50
 
 # Coded in five lower bits CWSEN
 CODE_DIRS={'N':1,'E':2,'S':4,'W':8,'C':16}
@@ -53,8 +53,9 @@ class Bug(VM):
 
         self.MyCell=cell
 
-
-    def cycle(self):
+    # Executes code at pos
+    def cycle(self,pos):
+        self.set_reg('PC',pos)
         steps=self.get_reg(self._stmdix)
         run=1
         while steps and run:

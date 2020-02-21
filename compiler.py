@@ -1,6 +1,6 @@
 
 OP_CODES=["_ld1","_ld2","_ld3","_ld4","_ld5","_st1","_st2","_st3","_st4",
-          "_mov","_psh","_pp",'_srcf','_wlkt','_wlkw','_wlk','_jmp','_add','_end']
+          "_mov","_psh","_pp",'_srcf','_wlkt','_wlkw','_wlk','_jmp','_jmpf','_jmpb','_nop','_add','_end']
 
 """
 todo: INPUT and OUTPUT
@@ -16,6 +16,8 @@ LD get_reg, val
         a ( numeric_value )
 """
 
+# todo: there are functions that use regidx and others dont. Looks like I screwed up. Need to run tests of each instruction
+# todo: actually I am putting strings into the compiled memory
 
 class Compiler:
     def __init__(self,prog,context):
@@ -23,7 +25,6 @@ class Compiler:
         self.bytecode=[]
         self.context=context
 
-        # todo: Needs to account for the code padding
         while self.program:
             op=self.program.pop(0)
             #func_name=switcher.get(op)
@@ -113,11 +114,13 @@ class Compiler:
         # Extract the REG keyword and reads the reg index
         self.program.pop(0)
         reg1=self.program.pop(0)
+        reg1idx=self.context['REGISTERS'][reg1]
         # Second operand is also a register
         self.program.pop(0)
         reg2=self.program.pop(0)
+        reg2idx=self.context['REGISTERS'][reg2]
         op_code=OP_CODES.index('_mov')
-        return [op_code,reg1,reg2]
+        return [op_code,reg1idx,reg2idx]
 
     # Adds value of reg2 to reg1
     # add wrt_reg1 ,reg2
@@ -126,19 +129,22 @@ class Compiler:
         # Extract the REG keyword and reads the reg index
         self.program.pop(0)
         reg1=self.program.pop(0)
+        reg1idx=self.context['REGISTERS'][reg1]
         # Second operand is also a register
         self.program.pop(0)
         reg2=self.program.pop(0)
+        reg2idx=self.context['REGISTERS'][reg2]
         op_code=OP_CODES.index('_add')
-        return [op_code, reg1, reg2]
+        return [op_code, reg1idx, reg2idx]
 
     # Pushes the content of reg to the stack
     # psh reg
     def PSH(self):
         self.program.pop(0)
         reg=self.program.pop(0)
+        regidx=self.context['REGISTERS'][reg]
         op_code=OP_CODES.index('_psh')
-        return [op_code, reg]
+        return [op_code, regidx]
 
 
     # Pops the head of the stack into reg
@@ -146,8 +152,9 @@ class Compiler:
     def POP(self):
         self.program.pop(0)
         reg=self.program.pop(0)
+        regidx=self.context['REGISTERS'][reg]
         op_code=OP_CODES.index('_pop')
-        return [op_code, reg]
+        return [op_code, regidx]
 
     def SRCF(self):
         op_code=OP_CODES.index('_srcf')
@@ -166,12 +173,28 @@ class Compiler:
         self.program.pop(0)
         op_code=OP_CODES.index('_wlk')
         reg=self.program.pop(0)
-        return [op_code, reg]
+        regidx=self.context['REGISTERS'][reg]
+        return [op_code, regidx]
 
     def JMP(self):
         op_code=OP_CODES.index('_jmp')
         dir=self.program.pop(0)
         return [op_code, dir]
+
+    # JMPF and JMPB should probably accept a Reg
+    def JMPF(self):
+        op_code=OP_CODES.index('_jmpf')
+        dir=self.program.pop(0)
+        return [op_code, dir]
+
+    def JMPB(self):
+        op_code=OP_CODES.index('_jmpb')
+        dir=self.program.pop(0)
+        return [op_code, dir]
+
+    def NOP(self):
+        op_code=OP_CODES.index('_nop')
+        return [op_code]
 
     def END(self):
         op_code=OP_CODES.index('_end')

@@ -8,41 +8,43 @@ import sys
 
 def serializedATN():
     with StringIO() as buf:
-        buf.write("\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3)")
-        buf.write("m\4\2\t\2\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b")
+        buf.write("\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3.")
+        buf.write("r\4\2\t\2\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b")
         buf.write("\t\b\4\t\t\t\4\n\t\n\4\13\t\13\3\2\3\2\3\2\7\2\32\n\2")
         buf.write("\f\2\16\2\35\13\2\3\2\3\2\7\2!\n\2\f\2\16\2$\13\2\3\3")
         buf.write("\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3")
         buf.write("\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3")
-        buf.write("\3\3\3\3\3\3\3\3\3\3\3\3\5\3H\n\3\3\4\3\4\3\4\3\4\3\4")
-        buf.write("\5\4O\n\4\3\5\3\5\3\5\3\5\3\5\5\5V\n\5\3\6\3\6\5\6Z\n")
-        buf.write("\6\3\7\3\7\5\7^\n\7\3\b\3\b\3\t\3\t\5\td\n\t\3\n\3\n\3")
-        buf.write("\13\6\13i\n\13\r\13\16\13j\3\13\2\2\f\2\4\6\b\n\f\16\20")
-        buf.write("\22\24\2\4\3\2\3\13\3\2\r\23\2v\2\33\3\2\2\2\4G\3\2\2")
-        buf.write("\2\6N\3\2\2\2\bU\3\2\2\2\nY\3\2\2\2\f]\3\2\2\2\16_\3\2")
-        buf.write("\2\2\20c\3\2\2\2\22e\3\2\2\2\24h\3\2\2\2\26\27\5\4\3\2")
-        buf.write("\27\30\7\'\2\2\30\32\3\2\2\2\31\26\3\2\2\2\32\35\3\2\2")
-        buf.write("\2\33\31\3\2\2\2\33\34\3\2\2\2\34\36\3\2\2\2\35\33\3\2")
-        buf.write("\2\2\36\"\5\4\3\2\37!\7\'\2\2 \37\3\2\2\2!$\3\2\2\2\"")
-        buf.write(" \3\2\2\2\"#\3\2\2\2#\3\3\2\2\2$\"\3\2\2\2%&\7\27\2\2")
-        buf.write("&\'\5\20\t\2\'(\7 \2\2()\5\6\4\2)H\3\2\2\2*+\7\34\2\2")
-        buf.write("+,\5\f\7\2,-\7 \2\2-.\5\b\5\2.H\3\2\2\2/\60\7\30\2\2\60")
-        buf.write("\61\5\f\7\2\61\62\7 \2\2\62\63\5\f\7\2\63H\3\2\2\2\64")
-        buf.write("\65\7\24\2\2\65\66\5\20\t\2\66\67\7 \2\2\678\5\f\7\28")
-        buf.write("H\3\2\2\29:\7\32\2\2:H\5\f\7\2;<\7\31\2\2<H\5\f\7\2=>")
-        buf.write("\7\26\2\2>H\7(\2\2?H\7\33\2\2@H\7\36\2\2AH\7\37\2\2BC")
-        buf.write("\7\35\2\2CH\5\f\7\2DH\7\25\2\2EF\7(\2\2FH\7%\2\2G%\3\2")
-        buf.write("\2\2G*\3\2\2\2G/\3\2\2\2G\64\3\2\2\2G9\3\2\2\2G;\3\2\2")
-        buf.write("\2G=\3\2\2\2G?\3\2\2\2G@\3\2\2\2GA\3\2\2\2GB\3\2\2\2G")
-        buf.write("D\3\2\2\2GE\3\2\2\2H\5\3\2\2\2IO\5\b\5\2JK\7!\2\2KL\5")
-        buf.write("\24\13\2LM\7\"\2\2MO\3\2\2\2NI\3\2\2\2NJ\3\2\2\2O\7\3")
-        buf.write("\2\2\2PV\5\n\6\2QR\7#\2\2RS\5\n\6\2ST\7$\2\2TV\3\2\2\2")
-        buf.write("UP\3\2\2\2UQ\3\2\2\2V\t\3\2\2\2WZ\5\24\13\2XZ\5\f\7\2")
-        buf.write("YW\3\2\2\2YX\3\2\2\2Z\13\3\2\2\2[^\5\20\t\2\\^\5\22\n")
-        buf.write("\2][\3\2\2\2]\\\3\2\2\2^\r\3\2\2\2_`\t\2\2\2`\17\3\2\2")
-        buf.write("\2ad\5\16\b\2bd\7\f\2\2ca\3\2\2\2cb\3\2\2\2d\21\3\2\2")
-        buf.write("\2ef\t\3\2\2f\23\3\2\2\2gi\7&\2\2hg\3\2\2\2ij\3\2\2\2")
-        buf.write("jh\3\2\2\2jk\3\2\2\2k\25\3\2\2\2\13\33\"GNUY]cj")
+        buf.write("\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\5\3M\n\3")
+        buf.write("\3\4\3\4\3\4\3\4\3\4\5\4T\n\4\3\5\3\5\3\5\3\5\3\5\5\5")
+        buf.write("[\n\5\3\6\3\6\5\6_\n\6\3\7\3\7\5\7c\n\7\3\b\3\b\3\t\3")
+        buf.write("\t\5\ti\n\t\3\n\3\n\3\13\6\13n\n\13\r\13\16\13o\3\13\2")
+        buf.write("\2\f\2\4\6\b\n\f\16\20\22\24\2\4\3\2\3\13\3\2\r\25\2~")
+        buf.write("\2\33\3\2\2\2\4L\3\2\2\2\6S\3\2\2\2\bZ\3\2\2\2\n^\3\2")
+        buf.write("\2\2\fb\3\2\2\2\16d\3\2\2\2\20h\3\2\2\2\22j\3\2\2\2\24")
+        buf.write("m\3\2\2\2\26\27\5\4\3\2\27\30\7,\2\2\30\32\3\2\2\2\31")
+        buf.write("\26\3\2\2\2\32\35\3\2\2\2\33\31\3\2\2\2\33\34\3\2\2\2")
+        buf.write("\34\36\3\2\2\2\35\33\3\2\2\2\36\"\5\4\3\2\37!\7,\2\2 ")
+        buf.write("\37\3\2\2\2!$\3\2\2\2\" \3\2\2\2\"#\3\2\2\2#\3\3\2\2\2")
+        buf.write("$\"\3\2\2\2%&\7\33\2\2&\'\5\20\t\2\'(\7%\2\2()\5\6\4\2")
+        buf.write(")M\3\2\2\2*+\7!\2\2+,\5\f\7\2,-\7%\2\2-.\5\b\5\2.M\3\2")
+        buf.write("\2\2/\60\7\35\2\2\60\61\5\f\7\2\61\62\7%\2\2\62\63\5\f")
+        buf.write("\7\2\63M\3\2\2\2\64\65\7\26\2\2\65\66\5\20\t\2\66\67\7")
+        buf.write("%\2\2\678\5\f\7\28M\3\2\2\29:\7\37\2\2:M\5\f\7\2;<\7\36")
+        buf.write("\2\2<M\5\f\7\2=>\7\30\2\2>M\7-\2\2?@\7\32\2\2@M\5\24\13")
+        buf.write("\2AB\7\31\2\2BM\5\24\13\2CM\7 \2\2DM\7#\2\2EM\7$\2\2F")
+        buf.write("G\7\"\2\2GM\5\f\7\2HM\7\27\2\2IM\7\34\2\2JK\7-\2\2KM\7")
+        buf.write("*\2\2L%\3\2\2\2L*\3\2\2\2L/\3\2\2\2L\64\3\2\2\2L9\3\2")
+        buf.write("\2\2L;\3\2\2\2L=\3\2\2\2L?\3\2\2\2LA\3\2\2\2LC\3\2\2\2")
+        buf.write("LD\3\2\2\2LE\3\2\2\2LF\3\2\2\2LH\3\2\2\2LI\3\2\2\2LJ\3")
+        buf.write("\2\2\2M\5\3\2\2\2NT\5\b\5\2OP\7&\2\2PQ\5\24\13\2QR\7\'")
+        buf.write("\2\2RT\3\2\2\2SN\3\2\2\2SO\3\2\2\2T\7\3\2\2\2U[\5\n\6")
+        buf.write("\2VW\7(\2\2WX\5\n\6\2XY\7)\2\2Y[\3\2\2\2ZU\3\2\2\2ZV\3")
+        buf.write("\2\2\2[\t\3\2\2\2\\_\5\24\13\2]_\5\f\7\2^\\\3\2\2\2^]")
+        buf.write("\3\2\2\2_\13\3\2\2\2`c\5\20\t\2ac\5\22\n\2b`\3\2\2\2b")
+        buf.write("a\3\2\2\2c\r\3\2\2\2de\t\2\2\2e\17\3\2\2\2fi\5\16\b\2")
+        buf.write("gi\7\f\2\2hf\3\2\2\2hg\3\2\2\2i\21\3\2\2\2jk\t\3\2\2k")
+        buf.write("\23\3\2\2\2ln\7+\2\2ml\3\2\2\2no\3\2\2\2om\3\2\2\2op\3")
+        buf.write("\2\2\2p\25\3\2\2\2\13\33\"LSZ^bho")
         return buf.getvalue()
 
 
@@ -58,16 +60,18 @@ class mvasmParser ( Parser ):
 
     literalNames = [ "<INVALID>", "'R1'", "'R2'", "'R3'", "'R4'", "'R5'", 
                      "'R6'", "'R7'", "'R8'", "'R9'", "'SRF'", "'CS'", "'CH'", 
-                     "'DS'", "'PC'", "'SP'", "'SRR'", "'DRS'", "'ADD'", 
-                     "'END'", "'JMP'", "'LD'", "'MOV'", "'POP'", "'PSH'", 
-                     "'SRCF'", "'ST'", "'WLK'", "'WLKT'", "'WLKW'", "','", 
-                     "'('", "')'", "'{'", "'}'", "':'" ]
+                     "'DS'", "'PC'", "'SP'", "'SRR'", "'DRS'", "'NRG'", 
+                     "'STM'", "'ADD'", "'END'", "'JMP'", "'JMPB'", "'JMPF'", 
+                     "'LD'", "'NOP'", "'MOV'", "'POP'", "'PSH'", "'SRCF'", 
+                     "'ST'", "'WLK'", "'WLKT'", "'WLKW'", "','", "'('", 
+                     "')'", "'{'", "'}'", "':'" ]
 
     symbolicNames = [ "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
                       "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
                       "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
                       "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
-                      "<INVALID>", "<INVALID>", "ADD", "END", "JMP", "LD", 
+                      "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
+                      "ADD", "END", "JMP", "JMPB", "JMPF", "LD", "NOP", 
                       "MOV", "POP", "PSH", "SRCF", "ST", "WLK", "WLKT", 
                       "WLKW", "COMMA", "OPAR", "CPAR", "OBRACE", "CBRACE", 
                       "COLON", "DIGIT", "NEWLINE", "VARIABLE", "WS" ]
@@ -104,28 +108,33 @@ class mvasmParser ( Parser ):
     T__14=15
     T__15=16
     T__16=17
-    ADD=18
-    END=19
-    JMP=20
-    LD=21
-    MOV=22
-    POP=23
-    PSH=24
-    SRCF=25
-    ST=26
-    WLK=27
-    WLKT=28
-    WLKW=29
-    COMMA=30
-    OPAR=31
-    CPAR=32
-    OBRACE=33
-    CBRACE=34
-    COLON=35
-    DIGIT=36
-    NEWLINE=37
-    VARIABLE=38
-    WS=39
+    T__17=18
+    T__18=19
+    ADD=20
+    END=21
+    JMP=22
+    JMPB=23
+    JMPF=24
+    LD=25
+    NOP=26
+    MOV=27
+    POP=28
+    PSH=29
+    SRCF=30
+    ST=31
+    WLK=32
+    WLKT=33
+    WLKW=34
+    COMMA=35
+    OPAR=36
+    CPAR=37
+    OBRACE=38
+    CBRACE=39
+    COLON=40
+    DIGIT=41
+    NEWLINE=42
+    VARIABLE=43
+    WS=44
 
     def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
         super().__init__(input, output)
@@ -485,6 +494,27 @@ class mvasmParser ( Parser ):
                 listener.exitInstrPOP(self)
 
 
+    class InstrJMPBContext(InstrContext):
+
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a mvasmParser.InstrContext
+            super().__init__(parser)
+            self.copyFrom(ctx)
+
+        def JMPB(self):
+            return self.getToken(mvasmParser.JMPB, 0)
+        def number(self):
+            return self.getTypedRuleContext(mvasmParser.NumberContext,0)
+
+
+        def enterRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "enterInstrJMPB" ):
+                listener.enterInstrJMPB(self)
+
+        def exitRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "exitInstrJMPB" ):
+                listener.exitInstrJMPB(self)
+
+
     class InstrJMPContext(InstrContext):
 
         def __init__(self, parser, ctx:ParserRuleContext): # actually a mvasmParser.InstrContext
@@ -505,13 +535,52 @@ class mvasmParser ( Parser ):
                 listener.exitInstrJMP(self)
 
 
+    class InstrNOPContext(InstrContext):
+
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a mvasmParser.InstrContext
+            super().__init__(parser)
+            self.copyFrom(ctx)
+
+        def NOP(self):
+            return self.getToken(mvasmParser.NOP, 0)
+
+        def enterRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "enterInstrNOP" ):
+                listener.enterInstrNOP(self)
+
+        def exitRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "exitInstrNOP" ):
+                listener.exitInstrNOP(self)
+
+
+    class InstrJMPFContext(InstrContext):
+
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a mvasmParser.InstrContext
+            super().__init__(parser)
+            self.copyFrom(ctx)
+
+        def JMPF(self):
+            return self.getToken(mvasmParser.JMPF, 0)
+        def number(self):
+            return self.getTypedRuleContext(mvasmParser.NumberContext,0)
+
+
+        def enterRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "enterInstrJMPF" ):
+                listener.enterInstrJMPF(self)
+
+        def exitRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "exitInstrJMPF" ):
+                listener.exitInstrJMPF(self)
+
+
 
     def instr(self):
 
         localctx = mvasmParser.InstrContext(self, self._ctx, self.state)
         self.enterRule(localctx, 2, self.RULE_instr)
         try:
-            self.state = 69
+            self.state = 74
             self._errHandler.sync(self)
             token = self._input.LA(1)
             if token in [mvasmParser.LD]:
@@ -586,44 +655,66 @@ class mvasmParser ( Parser ):
                 self.state = 60
                 self.match(mvasmParser.VARIABLE)
                 pass
-            elif token in [mvasmParser.SRCF]:
-                localctx = mvasmParser.InstrSRCFContext(self, localctx)
+            elif token in [mvasmParser.JMPF]:
+                localctx = mvasmParser.InstrJMPFContext(self, localctx)
                 self.enterOuterAlt(localctx, 8)
                 self.state = 61
+                self.match(mvasmParser.JMPF)
+                self.state = 62
+                self.number()
+                pass
+            elif token in [mvasmParser.JMPB]:
+                localctx = mvasmParser.InstrJMPBContext(self, localctx)
+                self.enterOuterAlt(localctx, 9)
+                self.state = 63
+                self.match(mvasmParser.JMPB)
+                self.state = 64
+                self.number()
+                pass
+            elif token in [mvasmParser.SRCF]:
+                localctx = mvasmParser.InstrSRCFContext(self, localctx)
+                self.enterOuterAlt(localctx, 10)
+                self.state = 65
                 self.match(mvasmParser.SRCF)
                 pass
             elif token in [mvasmParser.WLKT]:
                 localctx = mvasmParser.InstrWLKTContext(self, localctx)
-                self.enterOuterAlt(localctx, 9)
-                self.state = 62
+                self.enterOuterAlt(localctx, 11)
+                self.state = 66
                 self.match(mvasmParser.WLKT)
                 pass
             elif token in [mvasmParser.WLKW]:
                 localctx = mvasmParser.InstrwlkWContext(self, localctx)
-                self.enterOuterAlt(localctx, 10)
-                self.state = 63
+                self.enterOuterAlt(localctx, 12)
+                self.state = 67
                 self.match(mvasmParser.WLKW)
                 pass
             elif token in [mvasmParser.WLK]:
                 localctx = mvasmParser.InstrWLKContext(self, localctx)
-                self.enterOuterAlt(localctx, 11)
-                self.state = 64
+                self.enterOuterAlt(localctx, 13)
+                self.state = 68
                 self.match(mvasmParser.WLK)
-                self.state = 65
+                self.state = 69
                 self.reg()
                 pass
             elif token in [mvasmParser.END]:
                 localctx = mvasmParser.InstrEndContext(self, localctx)
-                self.enterOuterAlt(localctx, 12)
-                self.state = 66
+                self.enterOuterAlt(localctx, 14)
+                self.state = 70
                 self.match(mvasmParser.END)
+                pass
+            elif token in [mvasmParser.NOP]:
+                localctx = mvasmParser.InstrNOPContext(self, localctx)
+                self.enterOuterAlt(localctx, 15)
+                self.state = 71
+                self.match(mvasmParser.NOP)
                 pass
             elif token in [mvasmParser.VARIABLE]:
                 localctx = mvasmParser.InstrLabelContext(self, localctx)
-                self.enterOuterAlt(localctx, 13)
-                self.state = 67
+                self.enterOuterAlt(localctx, 16)
+                self.state = 72
                 self.match(mvasmParser.VARIABLE)
-                self.state = 68
+                self.state = 73
                 self.match(mvasmParser.COLON)
                 pass
             else:
@@ -702,23 +793,23 @@ class mvasmParser ( Parser ):
         localctx = mvasmParser.ValContext(self, self._ctx, self.state)
         self.enterRule(localctx, 4, self.RULE_val)
         try:
-            self.state = 76
+            self.state = 81
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [mvasmParser.T__0, mvasmParser.T__1, mvasmParser.T__2, mvasmParser.T__3, mvasmParser.T__4, mvasmParser.T__5, mvasmParser.T__6, mvasmParser.T__7, mvasmParser.T__8, mvasmParser.T__9, mvasmParser.T__10, mvasmParser.T__11, mvasmParser.T__12, mvasmParser.T__13, mvasmParser.T__14, mvasmParser.T__15, mvasmParser.T__16, mvasmParser.OBRACE, mvasmParser.DIGIT]:
+            if token in [mvasmParser.T__0, mvasmParser.T__1, mvasmParser.T__2, mvasmParser.T__3, mvasmParser.T__4, mvasmParser.T__5, mvasmParser.T__6, mvasmParser.T__7, mvasmParser.T__8, mvasmParser.T__9, mvasmParser.T__10, mvasmParser.T__11, mvasmParser.T__12, mvasmParser.T__13, mvasmParser.T__14, mvasmParser.T__15, mvasmParser.T__16, mvasmParser.T__17, mvasmParser.T__18, mvasmParser.OBRACE, mvasmParser.DIGIT]:
                 localctx = mvasmParser.ValmemContext(self, localctx)
                 self.enterOuterAlt(localctx, 1)
-                self.state = 71
+                self.state = 76
                 self.mem()
                 pass
             elif token in [mvasmParser.OPAR]:
                 localctx = mvasmParser.ValnumberContext(self, localctx)
                 self.enterOuterAlt(localctx, 2)
-                self.state = 72
+                self.state = 77
                 self.match(mvasmParser.OPAR)
-                self.state = 73
+                self.state = 78
                 self.number()
-                self.state = 74
+                self.state = 79
                 self.match(mvasmParser.CPAR)
                 pass
             else:
@@ -797,23 +888,23 @@ class mvasmParser ( Parser ):
         localctx = mvasmParser.MemContext(self, self._ctx, self.state)
         self.enterRule(localctx, 6, self.RULE_mem)
         try:
-            self.state = 83
+            self.state = 88
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [mvasmParser.T__0, mvasmParser.T__1, mvasmParser.T__2, mvasmParser.T__3, mvasmParser.T__4, mvasmParser.T__5, mvasmParser.T__6, mvasmParser.T__7, mvasmParser.T__8, mvasmParser.T__9, mvasmParser.T__10, mvasmParser.T__11, mvasmParser.T__12, mvasmParser.T__13, mvasmParser.T__14, mvasmParser.T__15, mvasmParser.T__16, mvasmParser.DIGIT]:
+            if token in [mvasmParser.T__0, mvasmParser.T__1, mvasmParser.T__2, mvasmParser.T__3, mvasmParser.T__4, mvasmParser.T__5, mvasmParser.T__6, mvasmParser.T__7, mvasmParser.T__8, mvasmParser.T__9, mvasmParser.T__10, mvasmParser.T__11, mvasmParser.T__12, mvasmParser.T__13, mvasmParser.T__14, mvasmParser.T__15, mvasmParser.T__16, mvasmParser.T__17, mvasmParser.T__18, mvasmParser.DIGIT]:
                 localctx = mvasmParser.MemRelContext(self, localctx)
                 self.enterOuterAlt(localctx, 1)
-                self.state = 78
+                self.state = 83
                 self.address()
                 pass
             elif token in [mvasmParser.OBRACE]:
                 localctx = mvasmParser.MemAbsContext(self, localctx)
                 self.enterOuterAlt(localctx, 2)
-                self.state = 79
+                self.state = 84
                 self.match(mvasmParser.OBRACE)
-                self.state = 80
+                self.state = 85
                 self.address()
-                self.state = 81
+                self.state = 86
                 self.match(mvasmParser.CBRACE)
                 pass
             else:
@@ -861,17 +952,17 @@ class mvasmParser ( Parser ):
         localctx = mvasmParser.AddressContext(self, self._ctx, self.state)
         self.enterRule(localctx, 8, self.RULE_address)
         try:
-            self.state = 87
+            self.state = 92
             self._errHandler.sync(self)
             token = self._input.LA(1)
             if token in [mvasmParser.DIGIT]:
                 self.enterOuterAlt(localctx, 1)
-                self.state = 85
+                self.state = 90
                 self.number()
                 pass
-            elif token in [mvasmParser.T__0, mvasmParser.T__1, mvasmParser.T__2, mvasmParser.T__3, mvasmParser.T__4, mvasmParser.T__5, mvasmParser.T__6, mvasmParser.T__7, mvasmParser.T__8, mvasmParser.T__9, mvasmParser.T__10, mvasmParser.T__11, mvasmParser.T__12, mvasmParser.T__13, mvasmParser.T__14, mvasmParser.T__15, mvasmParser.T__16]:
+            elif token in [mvasmParser.T__0, mvasmParser.T__1, mvasmParser.T__2, mvasmParser.T__3, mvasmParser.T__4, mvasmParser.T__5, mvasmParser.T__6, mvasmParser.T__7, mvasmParser.T__8, mvasmParser.T__9, mvasmParser.T__10, mvasmParser.T__11, mvasmParser.T__12, mvasmParser.T__13, mvasmParser.T__14, mvasmParser.T__15, mvasmParser.T__16, mvasmParser.T__17, mvasmParser.T__18]:
                 self.enterOuterAlt(localctx, 2)
-                self.state = 86
+                self.state = 91
                 self.reg()
                 pass
             else:
@@ -919,17 +1010,17 @@ class mvasmParser ( Parser ):
         localctx = mvasmParser.RegContext(self, self._ctx, self.state)
         self.enterRule(localctx, 10, self.RULE_reg)
         try:
-            self.state = 91
+            self.state = 96
             self._errHandler.sync(self)
             token = self._input.LA(1)
             if token in [mvasmParser.T__0, mvasmParser.T__1, mvasmParser.T__2, mvasmParser.T__3, mvasmParser.T__4, mvasmParser.T__5, mvasmParser.T__6, mvasmParser.T__7, mvasmParser.T__8, mvasmParser.T__9]:
                 self.enterOuterAlt(localctx, 1)
-                self.state = 89
+                self.state = 94
                 self.wrt_reg()
                 pass
-            elif token in [mvasmParser.T__10, mvasmParser.T__11, mvasmParser.T__12, mvasmParser.T__13, mvasmParser.T__14, mvasmParser.T__15, mvasmParser.T__16]:
+            elif token in [mvasmParser.T__10, mvasmParser.T__11, mvasmParser.T__12, mvasmParser.T__13, mvasmParser.T__14, mvasmParser.T__15, mvasmParser.T__16, mvasmParser.T__17, mvasmParser.T__18]:
                 self.enterOuterAlt(localctx, 2)
-                self.state = 90
+                self.state = 95
                 self.prt_reg()
                 pass
             else:
@@ -972,7 +1063,7 @@ class mvasmParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 93
+            self.state = 98
             _la = self._input.LA(1)
             if not((((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << mvasmParser.T__0) | (1 << mvasmParser.T__1) | (1 << mvasmParser.T__2) | (1 << mvasmParser.T__3) | (1 << mvasmParser.T__4) | (1 << mvasmParser.T__5) | (1 << mvasmParser.T__6) | (1 << mvasmParser.T__7) | (1 << mvasmParser.T__8))) != 0)):
                 self._errHandler.recoverInline(self)
@@ -1017,17 +1108,17 @@ class mvasmParser ( Parser ):
         localctx = mvasmParser.Wrt_regContext(self, self._ctx, self.state)
         self.enterRule(localctx, 14, self.RULE_wrt_reg)
         try:
-            self.state = 97
+            self.state = 102
             self._errHandler.sync(self)
             token = self._input.LA(1)
             if token in [mvasmParser.T__0, mvasmParser.T__1, mvasmParser.T__2, mvasmParser.T__3, mvasmParser.T__4, mvasmParser.T__5, mvasmParser.T__6, mvasmParser.T__7, mvasmParser.T__8]:
                 self.enterOuterAlt(localctx, 1)
-                self.state = 95
+                self.state = 100
                 self.gen_reg()
                 pass
             elif token in [mvasmParser.T__9]:
                 self.enterOuterAlt(localctx, 2)
-                self.state = 96
+                self.state = 101
                 self.match(mvasmParser.T__9)
                 pass
             else:
@@ -1070,9 +1161,9 @@ class mvasmParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 99
+            self.state = 104
             _la = self._input.LA(1)
-            if not((((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << mvasmParser.T__10) | (1 << mvasmParser.T__11) | (1 << mvasmParser.T__12) | (1 << mvasmParser.T__13) | (1 << mvasmParser.T__14) | (1 << mvasmParser.T__15) | (1 << mvasmParser.T__16))) != 0)):
+            if not((((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << mvasmParser.T__10) | (1 << mvasmParser.T__11) | (1 << mvasmParser.T__12) | (1 << mvasmParser.T__13) | (1 << mvasmParser.T__14) | (1 << mvasmParser.T__15) | (1 << mvasmParser.T__16) | (1 << mvasmParser.T__17) | (1 << mvasmParser.T__18))) != 0)):
                 self._errHandler.recoverInline(self)
             else:
                 self._errHandler.reportMatch(self)
@@ -1119,13 +1210,13 @@ class mvasmParser ( Parser ):
         self._la = 0 # Token type
         try:
             self.enterOuterAlt(localctx, 1)
-            self.state = 102 
+            self.state = 107 
             self._errHandler.sync(self)
             _la = self._input.LA(1)
             while True:
-                self.state = 101
+                self.state = 106
                 self.match(mvasmParser.DIGIT)
-                self.state = 104 
+                self.state = 109 
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
                 if not (_la==mvasmParser.DIGIT):

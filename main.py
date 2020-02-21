@@ -46,6 +46,14 @@ from cell import *
 
 #b=Bug()
 
+
+# v=VM()
+# v.set_mem(30,1)
+# v.set_mem(50,1)
+# cs=v.get_reg('CS')
+# s=v.find_blocks()
+# exit()
+
 stream=FileStream("test.asm")
 #stream = antlr4.InputStream("ADD R1,R2\n")
 analyzer=Analyzer(stream)
@@ -55,9 +63,8 @@ B=board(10,10)
 C=B.b[4][4]
 
 b=Bug(C)
-b.load(analyzer.Context['program'])
-
-b.cycle()
+pos=b.load(analyzer.Context['program'])
+b.cycle(pos)
 b.show_architecture()
 
 pass
