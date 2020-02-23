@@ -11,13 +11,18 @@ instr   :   LD wrt_reg COMMA val    #instrLD
         |   ADD wrt_reg COMMA reg   #instrADD
         |   PSH reg                 #instrPSH
         |   POP reg                 #instrPOP
+        |   INC wrt_reg             #instrINC
+        |   DEC wrt_reg             #instrDEC
         |   JMP VARIABLE            #instrJMP
         |   JMPF number             #instrJMPF
         |   JMPB number             #instrJMPB
+        |   JZ reg COMMA VARIABLE   #instrJZ
+        |   JNZ reg COMMA VARIABLE  #instrJNZ
         |   SRCF                    #instrSRCF
         |   WLKT                    #instrWLKT
         |   WLKW                    #instrwlkW
         |   WLK reg                 #instrWLK
+        |   EAT                     #instrEAT
         |   END                     #instrEnd
         |   NOP                     #instrNOP
         |   VARIABLE COLON          #instrLabel
@@ -51,10 +56,15 @@ number  :   DIGIT+
         ;
 
 ADD :   'ADD';
+DEC :   'DEC';
+EAT :   'EAT';
 END :   'END';
+INC :   'INC';
 JMP :   'JMP';
 JMPB:   'JMPB';
 JMPF:   'JMPF';
+JZ  :   'JZ';
+JNZ :   'JNZ';
 LD  :   'LD';
 NOP :   'NOP';
 MOV :   'MOV';

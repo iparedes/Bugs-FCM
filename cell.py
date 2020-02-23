@@ -14,23 +14,35 @@ class cell:
     def __init__(self):
         # In order: N, W, E, S
         self.neighbors=[]
-        # Things are the different elements that there is in a cell
-        # things[1]=food
-        # things[2]=herbivores
-        # things[3]=carnivores
-        # todo: Need to create a way of typifying the different bugs
-        self.things=[]
-        for i in range(0,4):
-            self.things.append(None)
+        self.bugs=[] # bugs in the cell
+        self.food=0 # pieces of food in the cell
         self.coord=None
 
+    def bug_in(self,bug):
+        if bug not in self.bugs:
+            self.bugs.append(bug)
+
+    def bug_out(self,bug):
+        try:
+            self.bugs.remove(bug)
+        except ValueError:
+            pass
+
+
+
     def has_food(self):
-        return self.things[1]
+        return self.food>0
 
     def harvest(self):
-        a=self.things[1]
-        self.things[1]=None
-        return a
+        if self.food>0:
+            self.food-=1
+            return 1
+        else:
+            return 0
+
+    def sow(self,q=1):
+        self.food+=q
+
 
     # Ret: a list of cells in the radius dist
     def get_neighbors(self,dist):
@@ -54,9 +66,9 @@ class cell:
         elif s.r<0:
             dirs.append('S')
         if s.c>0:
-            dirs.append('E')
-        elif s.c<0:
             dirs.append('W')
+        elif s.c<0:
+            dirs.append('E')
         return dirs
 
 class board:
@@ -84,8 +96,8 @@ class board:
         for r in range(0,self.height):
             for c in range(0,self.width):
                 # Sows food
-                if random.random()>FOOD_RATE:
-                    self.b[r][c].things[FOOD_THINGS_INDEX]=1
+                #if random.random()>FOOD_RATE:
+                    #self.b[r][c].sow()
                 # Adds the coord as a property
                 self.b[r][c].coord=TCPos(r,c)
                 for n in SHIFTS:
@@ -185,4 +197,18 @@ class board:
                 N.append([dr,dc])
         N.remove([0,0])
         return N
+
+
+    def display(self):
+        for r in range(0,self.height):
+            for c in range(0,self.width):
+                cell=self.b[r][c]
+                if cell.bugs:
+                    print('X',end="")
+                elif cell.food:
+                    print('o',end="")
+                else:
+                    print('.',end="")
+            print()
+
 

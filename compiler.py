@@ -1,6 +1,10 @@
 
-OP_CODES=["_ld1","_ld2","_ld3","_ld4","_ld5","_st1","_st2","_st3","_st4",
-          "_mov","_psh","_pp",'_srcf','_wlkt','_wlkw','_wlk','_jmp','_jmpf','_jmpb','_nop','_add','_end']
+OP_CODES=["_ld1","_ld2","_ld3","_ld4","_ld5",
+          "_st1","_st2","_st3","_st4","_mov",
+          "_psh","_pp",'_srcf','_wlkt','_wlkw',
+          '_wlk','_jmp','_jmpf','_jmpb','_nop',
+          '_add','_end','_eat','_inc','_dec',
+          '_jz','_jnz']
 
 """
 todo: INPUT and OUTPUT
@@ -181,11 +185,28 @@ class Compiler:
         dir=self.program.pop(0)
         return [op_code, dir]
 
-    # JMPF and JMPB should probably accept a Reg
+    # JMPF and JMPB should probably also accept a Reg
     def JMPF(self):
         op_code=OP_CODES.index('_jmpf')
         dir=self.program.pop(0)
         return [op_code, dir]
+
+    def JZ(self):
+        dir=self.program.pop(0)
+        self.program.pop(0)
+        reg=self.program.pop(0)
+        regidx=self.context['REGISTERS'][reg]
+        op_code=OP_CODES.index('_jz')
+        return [op_code,regidx,dir]
+
+    def JNZ(self):
+        dir=self.program.pop(0)
+        self.program.pop(0)
+        reg=self.program.pop(0)
+        regidx=self.context['REGISTERS'][reg]
+        op_code=OP_CODES.index('_jnz')
+        return [op_code,regidx,dir]
+
 
     def JMPB(self):
         op_code=OP_CODES.index('_jmpb')
@@ -196,9 +217,25 @@ class Compiler:
         op_code=OP_CODES.index('_nop')
         return [op_code]
 
+    def EAT(self):
+        op_code=OP_CODES.index('_eat')
+        return [op_code]
+
     def END(self):
         op_code=OP_CODES.index('_end')
         return [op_code]
 
+    def INC(self):
+        self.program.pop(0)
+        reg=self.program.pop(0)
+        regidx=self.context['REGISTERS'][reg]
+        op_code=OP_CODES.index('_inc')
+        return [op_code, regidx]
 
+    def DEC(self):
+        self.program.pop(0)
+        reg=self.program.pop(0)
+        regidx=self.context['REGISTERS'][reg]
+        op_code=OP_CODES.index('_dec')
+        return [op_code, regidx]
 

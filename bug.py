@@ -1,4 +1,6 @@
 from VM import *
+import cell
+import random
 
 
 SEARCH_RADIUS=1
@@ -25,11 +27,11 @@ class Bug(VM):
     """
 
 
-    def __init__(self,cell=None):
+    def __init__(self,brand=1,cell=None):
 
         # Add bug registers
         # SRR: Search radius. Determines the field of vision of the bug
-        # SRF: Search for. Holds the type of item to search for (1:food)
+        # SRF: Search for. Holds the brand of the item to search for (0:food, >1 bug)
         # DRS: Holds the result of the search operation. It codifies the directions where the items were found
         #       in the five lower bits CWSEN (C is Center)
         # NRG: The energy level of the bug. Reduced by executing instructions, increased by food
@@ -52,24 +54,39 @@ class Bug(VM):
         self.set_reg('STM',STAMINA)
 
         self.MyCell=cell
-
-    # Executes code at pos
-    def cycle(self,pos):
-        self.set_reg('PC',pos)
-        steps=self.get_reg(self._stmdix)
-        run=1
-        while steps and run:
-            run=self.step()
-            steps-=1
+        self.MyCell.bug_in(self)
+        if brand > 1:
+            self.set_brand(brand)
 
 
+
+    def _decode_dirs(self,dirs):
+        d=[]
+        for x in CODE_DIRS:
+            if dirs & CODE_DIRS[x]:
+                d.append(x)
+        return d
+
+
+    # Searches for the item coded in SRF (food or other bugs=
     # DRS codes directions in the five lower bits. CWSEN (C is Center)
     def _srcf(self):
+        logger.info("")
         radius=self.get_reg(self._srridx)
         item_type=self.get_reg(self._srfidx)
         # Gets list of cells in the view radius
         cells_in_radius=self.MyCell.get_neighbors(radius)
-        cells_with_item=[c for c in cells_in_radius if c.things[item_type]]
+
+        if item_type==0: # search food
+            cells_with_item=[c for c in cells_in_radius if c.has_food()]
+        else: # search bugs according to type/brand
+            cells_with_item=[]
+            for c in cells_in_radius:
+                for t in c.things:
+                    if t.get_brand()==item_type:
+                        cells_with_item.append(c)
+                        break
+
         dirs=[]
         for c in cells_with_item:
             if c==self.MyCell:
@@ -82,15 +99,60 @@ class Bug(VM):
             drs+=CODE_DIRS[d]
         self.set_reg('DRS',drs)
 
-    def _wlkt(self):
-        pass
 
+    # dir is ['N','S','E','W','C']
+    def __move_to(self,dir):
+        dir_code=cell.DIRS.index(dir)
+        new_cell=self.MyCell.neighbors[dir_code]
+        self.MyCell.bug_out(self)
+        self.MyCell=new_cell
+        self.MyCell.bug_in(self)
+
+
+    # Walks towards a direction in DRS
+    # DRS sets the directions to get to something that has been searched for
+    # There is room for different heuristics to select the direction in the case there are multiple
+    def _wlkt(self):
+        dirs=self.get_reg(self._drsidx)
+        # decodes the dirs
+        d=self._decode_dirs(dirs)
+        if d:
+            dir=d[0]
+            if dir != 'C':
+                self.__move_to(dir)
+            else:
+                pass
+        else:
+            dir=random.choice(['N','E','S','W'])
+            self.__move_to(dir)
+
+    # Walks away from DRS
     def _wlkw(self):
-        pass
+        dirs=self.get_reg(self._drsidx)
+        cdirs=[]
+        for d in CODE_DIRS.keys():
+            if not d in dirs:
+                cdirs.append(d)
+        if d:
+            dir=d[0]
+            if dir != 'C':
+                self.__move_to(dir)
+            else:
+                dir=random.choice(['N','E','S','W'])
+                self.__move_to(dir)
+        else:
+            dir=random.choice(['N','E','S','W'])
+            self.__move_to(dir)
+
+
+
 
     def _wlk(self):
         pass
 
+    def _eat(self):
+        f=self.MyCell.harvest()
+        # Need to add all the energy shebang
 
 
 

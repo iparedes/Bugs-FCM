@@ -1,8 +1,5 @@
-LD R1,(90)
-LD R2,(5)
-MOV R3,R1
-ADD R1,R2
-NOP
-NOP
-JMPB 7
+LD R1,(3)
+go:
+DEC R1
+JNZ R1,go
 END

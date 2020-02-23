@@ -1,5 +1,9 @@
 import logging
-logger = logging.getLogger(__name__)
+from analyzer import *
+import tools
+
+logger = tools.setup_logger('vm_logger', 'vm.log', logging.DEBUG)
+
 from compiler import *
 
 # todo: I am mixing absolute and relative addressing when using the PC. Load function returns absolute, while PC \
@@ -24,7 +28,8 @@ PROTECTED=[
     ('MEMSIZE',MEM_SIZE),
     ('PROTECTED',PROTECTED_SIZE),
     ('GENREGS',GEN_REGS),
-    ('CODEPCTG',CODE_PCTG)
+    ('CODEPCTG',CODE_PCTG),
+    ('BRAND',1) # Brand determines friend/foe. It is used by search operations. 0 is reserved for food. >0 are bugs
 ]
 
 # CS: Code Segment. Starts after the protected area
@@ -59,6 +64,10 @@ class VM:
             self.Memory[count]=elem[1]
             self.ProtSymbols[elem[0]]=count
 
+        # Accelerates access to some memory positions
+        self._brandpos=self.ProtSymbols['BRAND']
+
+
         # Start populating the registers list and dictionary of symbols
         for count,elem in enumerate(REGS,0):
             self.RegSymbols[elem]=count
@@ -89,6 +98,14 @@ class VM:
         # it points outside the memory (MEMSIZE)
         self.set_reg('SP',self.MemSize)
 
+
+
+    def set_brand(self,brand):
+        self.set_mem(self._brandpos,brand)
+
+    def get_brand(self):
+        b=self.get_mem(self._brandpos)
+        return b
 
     # Returns the absolute address of the next free cell from pos
     def search_free_from(self,pos):
@@ -121,7 +138,7 @@ class VM:
                 v=self.get_mem(i)
             return size
 
-    # Returns list with free memory blocks (pos,size)
+    # Returns list with free memory blocks (absolute pos,size)
     def find_blocks(self):
         cs=self.get_reg('CS')
         ds=self.get_reg('DS')
@@ -147,7 +164,19 @@ class VM:
         list.sort(key=lambda tup: tup[1])
         return list
 
-    def load(self,program):
+    def load_file(self,file):
+        logger.info(file)
+        stream=FileStream(file)
+        #stream = antlr4.InputStream("ADD R1,R2\n")
+        analyzer=Analyzer(stream)
+        analyzer.Walk()
+        pos=self._compile(analyzer.Context['program'])
+        return pos
+
+    # Compiles and stores a program in memory
+    # Returns the start address relative to CS
+    # if the program cannot be loaded returns -1
+    def _compile(self, program):
         Context={}
         Context['REGISTERS']=self.RegSymbols
         C=Compiler(program, Context)
@@ -156,9 +185,26 @@ class VM:
         for b in blocks:
             if b[1]>=length_prog:
                 pos=b[0]
+                # Loads the program in an absolute address...
                 self.set_mem_blk(pos,C.bytecode)
+                # ...but returns the address relative to CS
+                cs=self.get_reg('CS')
+                pos-=cs
                 return pos
-        return 0
+        return -1
+
+        # Sets to start the execution of code at pos
+    def run(self,pos):
+        self.set_reg('PC',pos)
+
+    # Executes code at pos
+    def cycle(self,pos):
+        self.set_reg('PC',pos)
+        steps=self.get_reg(self._stmdix)
+        run=1
+        while steps and run:
+            run=self.step()
+            steps-=1
 
     def get_reg(self,idx):
         # Look at this!!
@@ -194,11 +240,12 @@ class VM:
             self.set_mem(cont,item)
             cont+=1
 
-    # PC is always absolute address
+    # gets the value of the address pointed by the PC
+    # PC is relative to CS
     def _get_pc_code(self):
         cs=self.get_reg(self._csidx)
 
-        pcabs=self.get_reg(self._pcidx)
+        pcabs=self.get_reg(self._pcidx)+cs
 
         data=self.get_mem(pcabs)
         pcabs+=1
@@ -208,19 +255,20 @@ class VM:
         if pcabs==ds:
             pcabs=cs
 
-        self.set_reg(self._pcidx,pcabs)
+        self.set_reg(self._pcidx,pcabs-cs)
         return data
 
+    # Sets the PC as dir relative to CS
     def _set_pc(self,dir):
         cs=self.get_reg(self._csidx)
         ds=self.get_reg(self._dsidx)
         size=ds-cs
 
-        if dir>=ds:
+        # checks for turnarounds
+        if dir>=size:
             dir=dir-size
-        elif dir<cs:
+        elif dir<0:
             dir=dir+size
-
         self.set_reg(self._pcidx,dir)
 
 
@@ -229,7 +277,8 @@ class VM:
     def step(self):
         op_code=self._get_pc_code()
         symb_op_code=OP_CODES[op_code]
-        logger.debug(symb_op_code)
+        logger.info(symb_op_code)
+        logger.debug(self.show_architecture())
         func=getattr(self,symb_op_code)
         func()
         if symb_op_code=='_end':
@@ -238,6 +287,7 @@ class VM:
             return 1
 
     def _push(self,val):
+        logger.info(val)
         # SP points to the current head, so first we make it grow
         sp=self.get_reg(self._spidx)
         hp=self.get_reg(self._hpidx)
@@ -255,6 +305,7 @@ class VM:
     def _pop(self):
         sp=self.get_reg(self._spidx)
         val=self.get_mem(sp)
+        logger.info(val)
         sp+=1
         if sp==self.MemSize:
             # the stack goes beyond the bottom of the memory (maybe too many pops), it rolls over to the beginning
@@ -262,15 +313,16 @@ class VM:
             hp=self.get_reg(self._hpidx)
             sp=hp
         self.set_reg('SP',sp)
+        return val
 
 
     def show_architecture(self):
-        print("Memory size:",self.MemSize)
-        print("Protected size:",self.get_mem(self.ProtSymbols['PROTECTED']))
+        a="Memory size:"+str(self.MemSize)+" "
+        a+="Protected size:"+str(self.get_mem(self.ProtSymbols['PROTECTED']))+" "
 
         for r in self.RegSymbols.keys():
-            print(r+': '+str(self.get_reg(r)),end=' ')
-        print()
+            a+=r+': '+str(self.get_reg(r))+' '
+        return a
 
     def show_memory(self,start=0,end=MEM_SIZE):
         for i in range(start,end):
@@ -357,6 +409,16 @@ class VM:
         val=self.get_reg(reg)
         self.set_mem(addr,val)
 
+
+    # st4 reg1 {reg2}
+    # stores in the address contained in reg2 (absoloute) the value of register reg1
+    def _st4(self):
+        reg1=self._get_pc_code()
+        reg2=self._get_pc_code()
+        addr=self.get_reg(reg2)
+        val=self.get_reg(reg1)
+        self.set_mem(addr,val)
+
     def _add(self):
         reg1=self._get_pc_code()
         reg2=self._get_pc_code()
@@ -364,15 +426,17 @@ class VM:
         v2=self.get_reg(reg2)
         self.set_reg(reg1,v1+v2)
 
+    def _inc(self):
+        reg=self._get_pc_code()
+        v=self.get_reg(reg1)
+        v+=1
+        self.set_reg(reg,v)
 
-    # st4 reg1 {reg2}
-    # stores in the address contained in reg2 (absoloute) the value of register reg1
-    def _ld4(self):
-        reg1=self._get_pc_code()
-        reg2=self._get_pc_code()
-        addr=self.get_reg(reg2)
-        val=self.get_reg(reg1)
-        self.set_mem(addr,val)
+    def _dec(self):
+        reg=self._get_pc_code()
+        v=self.get_reg(reg)
+        v-=1
+        self.set_reg(reg,v)
 
 
     # mov reg1 reg2
@@ -398,7 +462,7 @@ class VM:
         self.set_reg(reg,val)
 
     # jmp dir
-    # sets the PC to dir
+    # sets the PC to dir relative to the CS
     def _jmp(self):
         dir=self._get_pc_code()
         self.set_reg(self._pcidx,dir)
@@ -416,6 +480,24 @@ class VM:
         val=self._get_pc_code()
         pc=self.get_reg(self._pcidx)
         self._set_pc(pc-val)
+
+    def _jz(self):
+        reg=self._get_pc_code()
+        dir=self._get_pc_code()
+        val=self.get_reg(reg)
+        if val==0:
+            self._set_pc(dir)
+
+    def _jnz(self):
+        reg=self._get_pc_code()
+        dir=self._get_pc_code()
+        val=self.get_reg(reg)
+        if val!=0:
+            self._set_pc(dir)
+        else:
+            pass
+
+
 
     def _nop(self):
         pass

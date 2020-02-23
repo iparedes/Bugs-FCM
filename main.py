@@ -1,4 +1,3 @@
-from analyzer import *
 from VM import *
 from bug import *
 from cell import *
@@ -54,17 +53,34 @@ from cell import *
 # s=v.find_blocks()
 # exit()
 
-stream=FileStream("test.asm")
-#stream = antlr4.InputStream("ADD R1,R2\n")
-analyzer=Analyzer(stream)
-analyzer.Walk()
+
 
 B=board(10,10)
+B.b[4][5].sow()
+B.b[8][5].sow()
+
 C=B.b[4][4]
 
-b=Bug(C)
-pos=b.load(analyzer.Context['program'])
-b.cycle(pos)
-b.show_architecture()
+b=Bug(cell=C)
+pos_test=b.load_file("test.asm")
+pos_eat=b.load_file("eat.asm")
+
+# stream=FileStream("test.asm")
+# #stream = antlr4.InputStream("ADD R1,R2\n")
+# analyzer=Analyzer(stream)
+# analyzer.Walk()
+# pos_test=b._compile(analyzer.Context['program'])
+
+
+
+#b.cycle(pos)
+b.run(pos_test)
+go=1
+while (go):
+    go=b.step()
+    B.display()
+    print('---------------------')
+    #input("")
+    print(b.show_architecture())
 
 pass

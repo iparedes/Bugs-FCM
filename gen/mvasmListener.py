@@ -71,6 +71,24 @@ class mvasmListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by mvasmParser#instrINC.
+    def enterInstrINC(self, ctx:mvasmParser.InstrINCContext):
+        pass
+
+    # Exit a parse tree produced by mvasmParser#instrINC.
+    def exitInstrINC(self, ctx:mvasmParser.InstrINCContext):
+        pass
+
+
+    # Enter a parse tree produced by mvasmParser#instrDEC.
+    def enterInstrDEC(self, ctx:mvasmParser.InstrDECContext):
+        pass
+
+    # Exit a parse tree produced by mvasmParser#instrDEC.
+    def exitInstrDEC(self, ctx:mvasmParser.InstrDECContext):
+        pass
+
+
     # Enter a parse tree produced by mvasmParser#instrJMP.
     def enterInstrJMP(self, ctx:mvasmParser.InstrJMPContext):
         pass
@@ -95,6 +113,24 @@ class mvasmListener(ParseTreeListener):
 
     # Exit a parse tree produced by mvasmParser#instrJMPB.
     def exitInstrJMPB(self, ctx:mvasmParser.InstrJMPBContext):
+        pass
+
+
+    # Enter a parse tree produced by mvasmParser#instrJZ.
+    def enterInstrJZ(self, ctx:mvasmParser.InstrJZContext):
+        pass
+
+    # Exit a parse tree produced by mvasmParser#instrJZ.
+    def exitInstrJZ(self, ctx:mvasmParser.InstrJZContext):
+        pass
+
+
+    # Enter a parse tree produced by mvasmParser#instrJNZ.
+    def enterInstrJNZ(self, ctx:mvasmParser.InstrJNZContext):
+        pass
+
+    # Exit a parse tree produced by mvasmParser#instrJNZ.
+    def exitInstrJNZ(self, ctx:mvasmParser.InstrJNZContext):
         pass
 
 
@@ -131,6 +167,15 @@ class mvasmListener(ParseTreeListener):
 
     # Exit a parse tree produced by mvasmParser#instrWLK.
     def exitInstrWLK(self, ctx:mvasmParser.InstrWLKContext):
+        pass
+
+
+    # Enter a parse tree produced by mvasmParser#instrEAT.
+    def enterInstrEAT(self, ctx:mvasmParser.InstrEATContext):
+        pass
+
+    # Exit a parse tree produced by mvasmParser#instrEAT.
+    def exitInstrEAT(self, ctx:mvasmParser.InstrEATContext):
         pass
 
 

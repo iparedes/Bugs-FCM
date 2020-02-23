@@ -1,10 +1,8 @@
 import logging
-
-logger = logging.getLogger(__name__)
-FORMAT = "[%(funcName)20s() ] %(message)s"
-logging.basicConfig(format=FORMAT, filename="sem.log", level=logging.DEBUG)
-
+import tools
 from gen.mvasmListener import *
+
+logger = tools.setup_logger('sem_logger', 'sem.log', logging.DEBUG)
 
 
 class Sem(mvasmListener):
@@ -25,19 +23,32 @@ class Sem(mvasmListener):
         # Enter a parse tree produced by subleqasmParser#program.
 
     def enterProgram(self, ctx: mvasmParser.ProgramContext):
-        logger.debug(ctx.getText())
+        logger.info("")
         if self.Context['stage']==1:
             self.MemPointer = 0
 
     # Exit a parse tree produced by mvasmParser#program.
     def exitProgram(self, ctx: mvasmParser.ProgramContext):
-        logger.debug(ctx.getText())
+        logger.info("")
         if self.Context['stage'] == 2:
             self.Context['program'] = self.Sequence
 
+    # Enter a parse tree produced by mvasmParser#instrEAT.
+    def enterInstrEAT(self, ctx:mvasmParser.InstrEATContext):
+        logger.info(ctx.getText())
+        if self.Context['stage'] == 1:
+            self.MemPointer += 1
+        else:
+            self.add("EAT")
+
+    # Exit a parse tree produced by mvasmParser#instrEAT.
+    def exitInstrEAT(self, ctx:mvasmParser.InstrEATContext):
+        pass
+
+
     # Enter a parse tree produced by mvasmParser#instrEnd.
     def enterInstrEnd(self, ctx: mvasmParser.InstrEndContext):
-        logger.debug(ctx.getText())
+        logger.info(ctx.getText())
         if self.Context['stage'] == 1:
             self.MemPointer += 1
         else:
@@ -49,7 +60,7 @@ class Sem(mvasmListener):
 
     # Enter a parse tree produced by mvasmParser#instrLD.
     def enterInstrLD(self, ctx: mvasmParser.InstrLDContext):
-        logger.debug(ctx.getText())
+        logger.info(ctx.getText())
         if self.Context['stage'] == 1:
             self.MemPointer += 3
         else:
@@ -61,7 +72,7 @@ class Sem(mvasmListener):
 
     # Enter a parse tree produced by mvasmParser#instrNOP.
     def enterInstrNOP(self, ctx:mvasmParser.InstrNOPContext):
-        logger.debug(ctx.getText())
+        logger.info(ctx.getText())
         if self.Context['stage'] == 1:
             self.MemPointer += 1
         else:
@@ -74,7 +85,7 @@ class Sem(mvasmListener):
 
     # Enter a parse tree produced by mvasmParser#instrST.
     def enterInstrST(self, ctx: mvasmParser.InstrSTContext):
-        logger.debug(ctx.getText())
+        logger.info(ctx.getText())
         if self.Context['stage'] == 1:
             self.MemPointer += 3
         else:
@@ -86,7 +97,7 @@ class Sem(mvasmListener):
 
     # Enter a parse tree produced by mvasmParser#instrMOV.
     def enterInstrMOV(self, ctx: mvasmParser.InstrMOVContext):
-        logger.debug(ctx.getText())
+        logger.info(ctx.getText())
         if self.Context['stage'] == 1:
             self.MemPointer += 3
         else:
@@ -98,7 +109,7 @@ class Sem(mvasmListener):
 
     # Enter a parse tree produced by mvasmParser#instrPSH.
     def enterInstrPSH(self, ctx: mvasmParser.InstrPSHContext):
-        logger.debug(ctx.getText())
+        logger.info(ctx.getText())
         if self.Context['stage'] == 1:
             self.MemPointer += 2
         else:
@@ -110,7 +121,7 @@ class Sem(mvasmListener):
 
     # Enter a parse tree produced by mvasmParser#instrPOP.
     def enterInstrPOP(self, ctx: mvasmParser.InstrPOPContext):
-        logger.debug(ctx.getText())
+        logger.info(ctx.getText())
         if self.Context['stage'] == 1:
             self.MemPointer += 2
         else:
@@ -118,6 +129,31 @@ class Sem(mvasmListener):
 
     # Exit a parse tree produced by mvasmParser#instrPOP.
     def exitInstrPOP(self, ctx: mvasmParser.InstrPOPContext):
+        pass
+
+    # Enter a parse tree produced by mvasmParser#instrINC.
+    def enterInstrINC(self, ctx:mvasmParser.InstrINCContext):
+        logger.info(ctx.getText())
+        if self.Context['stage'] == 1:
+            self.MemPointer += 2
+        else:
+            self.add("INC")
+
+    # Exit a parse tree produced by mvasmParser#instrINC.
+    def exitInstrINC(self, ctx:mvasmParser.InstrINCContext):
+        pass
+
+
+    # Enter a parse tree produced by mvasmParser#instrDEC.
+    def enterInstrDEC(self, ctx:mvasmParser.InstrDECContext):
+        logger.info(ctx.getText())
+        if self.Context['stage'] == 1:
+            self.MemPointer += 2
+        else:
+            self.add("DEC")
+
+    # Exit a parse tree produced by mvasmParser#instrDEC.
+    def exitInstrDEC(self, ctx:mvasmParser.InstrDECContext):
         pass
 
     # Enter a parse tree produced by mvasmParser#reg.
@@ -134,10 +170,10 @@ class Sem(mvasmListener):
 
     # Exit a parse tree produced by mvasmParser#prt_reg.
     def exitPrt_reg(self, ctx: mvasmParser.Prt_regContext):
-        logger.debug(ctx.getText())
+        logger.info(ctx.getText())
         if self.Context['stage'] == 2:
             reg = ctx.getText()
-            logger.debug(reg)
+            logger.info(reg)
             self.add('REG')
             self.add(reg)
 
@@ -147,16 +183,16 @@ class Sem(mvasmListener):
 
     # Exit a parse tree produced by mvasmParser#wrt_reg.
     def exitWrt_reg(self, ctx: mvasmParser.Wrt_regContext):
-        logger.debug(ctx.getText())
+        logger.info(ctx.getText())
         if self.Context['stage'] == 2:
             reg = ctx.getText()
-            logger.debug(reg)
+            logger.info(reg)
             self.add('REG')
             self.add(reg)
 
     # Enter a parse tree produced by mvasmParser#mem.
     def enterMemRel(self, ctx: mvasmParser.MemContext):
-        logger.debug(ctx.getText())
+        logger.info(ctx.getText())
         if self.Context['stage'] == 2:
             self.add('REL')
 
@@ -166,7 +202,7 @@ class Sem(mvasmListener):
 
     # Enter a parse tree produced by mvasmParser#mem.
     def enterMemAbs(self, ctx: mvasmParser.MemContext):
-        logger.debug(ctx.getText())
+        logger.info(ctx.getText())
         if self.Context['stage'] == 2:
             self.add('ABS')
 
@@ -176,19 +212,19 @@ class Sem(mvasmListener):
 
     # Enter a parse tree produced by mvasmParser#address.
     def enterAddress(self, ctx: mvasmParser.AddressContext):
-        pass
-
-    # Exit a parse tree produced by mvasmParser#address.
-    def exitAddress(self, ctx: mvasmParser.AddressContext):
-        logger.debug(ctx.getText())
+        logger.info(ctx.getText())
         if self.Context['stage'] == 2:
             addr = int(ctx.getText())
             self.add('ADDR')
-            self.add(addr)
+            #self.add(addr)
+
+    # Exit a parse tree produced by mvasmParser#address.
+    def exitAddress(self, ctx: mvasmParser.AddressContext):
+        pass
 
     # Enter a parse tree produced by mvasmParser#instrADD.
     def enterInstrADD(self, ctx: mvasmParser.InstrADDContext):
-        logger.debug(ctx.getText())
+        logger.info(ctx.getText())
         if self.Context['stage'] == 1:
             self.MemPointer += 3
         else:
@@ -200,7 +236,7 @@ class Sem(mvasmListener):
 
     # Enter a parse tree produced by mvasmParser#instrSRCF.
     def enterInstrSRCF(self, ctx: mvasmParser.InstrSRCFContext):
-        logger.debug(ctx.getText())
+        logger.info(ctx.getText())
         if self.Context['stage'] == 1:
             self.MemPointer += 1
         else:
@@ -212,7 +248,7 @@ class Sem(mvasmListener):
 
     # Enter a parse tree produced by mvasmParser#instrWLKT.
     def enterInstrWLKT(self, ctx: mvasmParser.InstrWLKTContext):
-        logger.debug(ctx.getText())
+        logger.info(ctx.getText())
         if self.Context['stage'] == 1:
             self.MemPointer += 1
         else:
@@ -224,7 +260,7 @@ class Sem(mvasmListener):
 
     # Enter a parse tree produced by mvasmParser#instrwlkW.
     def enterInstrwlkW(self, ctx: mvasmParser.InstrwlkWContext):
-        logger.debug(ctx.getText())
+        logger.info(ctx.getText())
         if self.Context['stage'] == 1:
             self.MemPointer += 1
         else:
@@ -236,7 +272,7 @@ class Sem(mvasmListener):
 
     # Enter a parse tree produced by mvasmParser#instrWLK.
     def enterInstrWLK(self, ctx: mvasmParser.InstrWLKContext):
-        logger.debug(ctx.getText())
+        logger.info(ctx.getText())
         if self.Context['stage'] == 1:
             self.MemPointer += 2
         else:
@@ -248,7 +284,7 @@ class Sem(mvasmListener):
 
     # Enter a parse tree produced by mvasmParser#instrJMP.
     def enterInstrJMP(self, ctx: mvasmParser.InstrJMPContext):
-        logger.debug(ctx.getText())
+        logger.info(ctx.getText())
         if self.Context['stage'] == 1:
             self.MemPointer += 2
         else:
@@ -262,9 +298,9 @@ class Sem(mvasmListener):
 
     # Enter a parse tree produced by mvasmParser#instrJMPF.
     def enterInstrJMPF(self, ctx: mvasmParser.InstrJMPFContext):
-        logger.debug(ctx.getText())
+        logger.info(ctx.getText())
         if self.Context['stage'] == 1:
-            self.MemPointer += 1
+            self.MemPointer += 2
         else:
             self.add("JMPF")
 
@@ -274,15 +310,47 @@ class Sem(mvasmListener):
 
     # Enter a parse tree produced by mvasmParser#instrJMPB.
     def enterInstrJMPB(self, ctx: mvasmParser.InstrJMPBContext):
-        logger.debug(ctx.getText())
+        logger.info(ctx.getText())
         if self.Context['stage'] == 1:
-            self.MemPointer += 1
+            self.MemPointer += 2
         else:
             self.add("JMPB")
 
     # Exit a parse tree produced by mvasmParser#instrJMPB.
     def exitInstrJMPB(self, ctx: mvasmParser.InstrJMPBContext):
         pass
+
+    # Enter a parse tree produced by mvasmParser#instrJZ.
+    def enterInstrJZ(self, ctx:mvasmParser.InstrJZContext):
+        logger.info(ctx.getText())
+        if self.Context['stage'] == 1:
+            self.MemPointer += 3
+        else:
+            self.add("JZ")
+            dir = ctx.stop.text
+            self.add(self.Labels[dir])
+
+
+    # Exit a parse tree produced by mvasmParser#instrJZ.
+    def exitInstrJZ(self, ctx:mvasmParser.InstrJZContext):
+        pass
+
+
+    # Enter a parse tree produced by mvasmParser#instrJNZ.
+    def enterInstrJNZ(self, ctx:mvasmParser.InstrJNZContext):
+        logger.info(ctx.getText())
+        if self.Context['stage'] == 1:
+            self.MemPointer += 3
+        else:
+            self.add("JNZ")
+            dir = ctx.stop.text
+            self.add(self.Labels[dir])
+
+    # Exit a parse tree produced by mvasmParser#instrJNZ.
+    def exitInstrJNZ(self, ctx:mvasmParser.InstrJNZContext):
+        pass
+
+
 
     # Enter a parse tree produced by mvasmParser#valmem.
     def enterValmem(self, ctx: mvasmParser.ValmemContext):
@@ -294,7 +362,7 @@ class Sem(mvasmListener):
 
     # Enter a parse tree produced by mvasmParser#valnumber.
     def enterValnumber(self, ctx: mvasmParser.ValnumberContext):
-        logger.debug(ctx.getText())
+        logger.info(ctx.getText())
         if self.Context['stage'] == 2:
             self.add('VAL')
 
@@ -308,14 +376,14 @@ class Sem(mvasmListener):
 
     # Exit a parse tree produced by mvasmParser#number.
     def exitNumber(self, ctx: mvasmParser.NumberContext):
-        logger.debug(ctx.getText())
+        logger.info(ctx.getText())
         if self.Context['stage'] == 2:
             number = int(ctx.getText())
             self.add(number)
 
     # Enter a parse tree produced by mvasmParser#instrLabel.
     def enterInstrLabel(self, ctx: mvasmParser.InstrLabelContext):
-        logger.debug(ctx.getText())
+        logger.info(ctx.getText())
         if self.Context['stage'] == 1:
             txt = ctx.getText()[:-1]
             self.Labels[txt] = self.MemPointer
