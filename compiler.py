@@ -6,6 +6,18 @@ OP_CODES=["_ld1","_ld2","_ld3","_ld4","_ld5",
           '_add','_end','_eat','_inc','_dec',
           '_jz','_jnz']
 
+
+# returns the symbol of an op_code
+# if the index is out of bounds, normalizes it to get a valid result
+def get_symbol_op_code(index):
+    l=len(OP_CODES)
+    if index<0:
+        index=-index
+    if index>=l:
+        index=index % l
+    symbol=OP_CODES[index]
+    return symbol
+
 """
 todo: INPUT and OUTPUT
 """
@@ -28,9 +40,10 @@ class Compiler:
         self.program=list(prog)
         self.bytecode=[]
         self.context=context
+        self.posrel=0
 
         while self.program:
-            op=self.program.pop(0)
+            op=self._next()
             #func_name=switcher.get(op)
             method = getattr(self, op)
             instr=method()
@@ -38,6 +51,10 @@ class Compiler:
             self.bytecode+=instr
 
 
+    def _next(self):
+        op=self.program.pop(0)
+        self.posrel+=1
+        return op
 
     """
     Loads the value of a memory address in a register
@@ -51,13 +68,13 @@ class Compiler:
     def LD(self):
         # First operand is a register
         # Extract the REG keyword and reads the reg index
-        self.program.pop(0)
-        reg=self.program.pop(0)
+        self._next()
+        reg=self._next()
         regidx=self.context['REGISTERS'][reg]
-        type=self.program.pop(0)
+        type=self._next()
         if type=='REL':
-            op=self.program.pop(0)
-            val=self.program.pop(0)
+            op=self._next()
+            val=self._next()
             if op=='ADDR':
                 # ld1
                 op_code='_ld1'
@@ -65,8 +82,8 @@ class Compiler:
                 # ld2
                 op_code='_ld2'
         elif type=='ABS':
-            op=self.program.pop(0)
-            val=self.program.pop(0)
+            op=self._next()
+            val=self._next()
             if op=='ADDR':
                 # ld3
                 op_code='_ld3'
@@ -75,7 +92,7 @@ class Compiler:
                 op_code='_ld4'
         else: # type=='VAL':
             # ld5
-            val=self.program.pop(0)
+            val=self._next()
             op_code='_ld5'
         op_code=OP_CODES.index(op_code)
         return [op_code,regidx,val]
@@ -89,12 +106,12 @@ class Compiler:
     st4: reg, abs_reg
     """
     def ST(self):
-        self.program.pop(0)
-        reg=self.program.pop(0)
+        self._next()
+        reg=self._next()
         regidx=self.context['REGISTERS'][reg]
-        type=self.program.pop(0)
-        op=self.program.pop(0)
-        val=self.program.pop(0)
+        type=self._next()
+        op=self._next()
+        val=self._next()
         if type=='REL':
             if op=='ADDR':
                 # st1
@@ -116,12 +133,12 @@ class Compiler:
     def MOV(self):
         # First operand is a register
         # Extract the REG keyword and reads the reg index
-        self.program.pop(0)
-        reg1=self.program.pop(0)
+        self._next()
+        reg1=self._next()
         reg1idx=self.context['REGISTERS'][reg1]
         # Second operand is also a register
-        self.program.pop(0)
-        reg2=self.program.pop(0)
+        self._next()
+        reg2=self._next()
         reg2idx=self.context['REGISTERS'][reg2]
         op_code=OP_CODES.index('_mov')
         return [op_code,reg1idx,reg2idx]
@@ -131,12 +148,12 @@ class Compiler:
     def ADD(self):
         # First operand is a register
         # Extract the REG keyword and reads the reg index
-        self.program.pop(0)
-        reg1=self.program.pop(0)
+        self._next()
+        reg1=self._next()
         reg1idx=self.context['REGISTERS'][reg1]
         # Second operand is also a register
-        self.program.pop(0)
-        reg2=self.program.pop(0)
+        self._next()
+        reg2=self._next()
         reg2idx=self.context['REGISTERS'][reg2]
         op_code=OP_CODES.index('_add')
         return [op_code, reg1idx, reg2idx]
@@ -144,8 +161,8 @@ class Compiler:
     # Pushes the content of reg to the stack
     # psh reg
     def PSH(self):
-        self.program.pop(0)
-        reg=self.program.pop(0)
+        self._next()
+        reg=self._next()
         regidx=self.context['REGISTERS'][reg]
         op_code=OP_CODES.index('_psh')
         return [op_code, regidx]
@@ -154,8 +171,8 @@ class Compiler:
     # Pops the head of the stack into reg
     # pop reg
     def POP(self):
-        self.program.pop(0)
-        reg=self.program.pop(0)
+        self._next()
+        reg=self._next()
         regidx=self.context['REGISTERS'][reg]
         op_code=OP_CODES.index('_pop')
         return [op_code, regidx]
@@ -174,35 +191,35 @@ class Compiler:
         return [op_code]
 
     def WLK(self):
-        self.program.pop(0)
+        self._next()
         op_code=OP_CODES.index('_wlk')
-        reg=self.program.pop(0)
+        reg=self._next()
         regidx=self.context['REGISTERS'][reg]
         return [op_code, regidx]
 
     def JMP(self):
         op_code=OP_CODES.index('_jmp')
-        dir=self.program.pop(0)
+        dir=self._next()
         return [op_code, dir]
 
     # JMPF and JMPB should probably also accept a Reg
     def JMPF(self):
         op_code=OP_CODES.index('_jmpf')
-        dir=self.program.pop(0)
+        dir=self._next()
         return [op_code, dir]
 
     def JZ(self):
-        dir=self.program.pop(0)
-        self.program.pop(0)
-        reg=self.program.pop(0)
+        dir=self._next()
+        self._next()
+        reg=self._next()
         regidx=self.context['REGISTERS'][reg]
         op_code=OP_CODES.index('_jz')
         return [op_code,regidx,dir]
 
     def JNZ(self):
-        dir=self.program.pop(0)
-        self.program.pop(0)
-        reg=self.program.pop(0)
+        dir=self._next()
+        self._next()
+        reg=self._next()
         regidx=self.context['REGISTERS'][reg]
         op_code=OP_CODES.index('_jnz')
         return [op_code,regidx,dir]
@@ -210,7 +227,7 @@ class Compiler:
 
     def JMPB(self):
         op_code=OP_CODES.index('_jmpb')
-        dir=self.program.pop(0)
+        dir=self._next()
         return [op_code, dir]
 
     def NOP(self):
@@ -226,15 +243,15 @@ class Compiler:
         return [op_code]
 
     def INC(self):
-        self.program.pop(0)
-        reg=self.program.pop(0)
+        self._next()
+        reg=self._next()
         regidx=self.context['REGISTERS'][reg]
         op_code=OP_CODES.index('_inc')
         return [op_code, regidx]
 
     def DEC(self):
-        self.program.pop(0)
-        reg=self.program.pop(0)
+        self._next()
+        reg=self._next()
         regidx=self.context['REGISTERS'][reg]
         op_code=OP_CODES.index('_dec')
         return [op_code, regidx]

@@ -49,7 +49,7 @@ gen_reg : 'R1' | 'R2'| 'R3'| 'R4'| 'R5'| 'R6'| 'R7'| 'R8'| 'R9'
 wrt_reg :   gen_reg | 'SRF'
         ;
 
-prt_reg : 'CS' | 'CH' | 'DS' | 'PC' | 'SP' | 'SRR' | 'DRS' | 'NRG' | 'STM'
+prt_reg : 'CS' | 'CH' | 'DS' | 'PC' | 'SP' | 'PS' | 'SRR' | 'DRS' | 'NRG' | 'STM'
         ;
 
 number  :   DIGIT+

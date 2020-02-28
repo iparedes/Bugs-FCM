@@ -1,13 +1,12 @@
 import logging
 from analyzer import *
 import tools
+import compiler
 
 logger = tools.setup_logger('vm_logger', 'vm.log', logging.DEBUG)
 
 from compiler import *
 
-# todo: I am mixing absolute and relative addressing when using the PC. Load function returns absolute, while PC \
-# should be relative to the CS
 
 """
 Keep it simple
@@ -18,6 +17,7 @@ MEM_SIZE=256        # Size of memory block
 PROTECTED_SIZE=20   # Protected memory cannot be modified using code, just by mutation
 GEN_REGS=8          # Number of general purpose registers
 CODE_PCTG=0.25      # Percentage of memory extra-allocated to the Code Segment
+STEPS_CYCLE=50      # Max number of steps in a run to avoid infinte loops or neverending programs
 
 
 # Description of protected memory cells (only for the initial VM)
@@ -29,6 +29,7 @@ PROTECTED=[
     ('PROTECTED',PROTECTED_SIZE),
     ('GENREGS',GEN_REGS),
     ('CODEPCTG',CODE_PCTG),
+    ('STEPSCYCLE',STEPS_CYCLE),
     ('BRAND',1) # Brand determines friend/foe. It is used by search operations. 0 is reserved for food. >0 are bugs
 ]
 
@@ -37,68 +38,125 @@ PROTECTED=[
 # DS: Data Segment
 # SP: Stack Pointer
 # HP: Heap Pointer
-REGS=['CS', 'DS', 'PC', 'SP', 'HP']
+# PS: Program Start
+REGS=['CS', 'DS', 'PC', 'SP', 'HP','PS']
 
 
 class VM:
-    def __init__(self,memsize=MEM_SIZE):
+    def __init__(self,memsize=MEM_SIZE,mem=None,regs=None):
         """The registers, internally are representated by numbers, 0 is the first register in REGS,
         """
         self.MemSize=memsize
         self.Regs=[]
         self.ProtSymbols={} # Dictionary: Key is the protected symbol, Value is the memory absolute position
         self.RegSymbols={}  # Dictionary: Key is the register symbol, Value is the index of the registers array
-        self.Memory=[0]*self.MemSize
+        self.Memory=[0]*self.MemSize # todo: initialize to random to give more chances in mutation. This will require
+                                     # todo: a redo of the load-find-blocks mechanism. Maybe using a Program Allocation Table
 
+        self.PAT={} # Programs Allocation Table. Contains the memory addresses that the programs have been loaded in
         # Tries to accelerate access to registers
         self._pcidx=REGS.index('PC')
         self._csidx=REGS.index('CS')
         self._dsidx=REGS.index('DS')
         self._spidx=REGS.index('SP')
         self._hpidx=REGS.index('HP')
+        self._psidx=REGS.index('PS')
 
-        # Populates protected memory
+
         # Creates Protsymbols to access the memory protected data by name
         for count,elem in enumerate(PROTECTED,0):
-            self.Memory[count]=elem[1]
-            self.Memory[count]=elem[1]
             self.ProtSymbols[elem[0]]=count
 
         # Accelerates access to some memory positions
         self._brandpos=self.ProtSymbols['BRAND']
 
-
         # Start populating the registers list and dictionary of symbols
         for count,elem in enumerate(REGS,0):
             self.RegSymbols[elem]=count
-            self.Regs.append(0)
+        # watchout here
+        self.initialize(mem,regs)
 
-        # Continue populating with the general registers
-        start=len(REGS)
-        size=self.Memory[self.ProtSymbols['GENREGS']]
-        for count in range(0,size):
-            self.RegSymbols['R'+str(count)]=start+count
-            self.Regs.append(0)
+    # initializes memory and registers
+    # it is used by the init function, so it takes default values,
+    # or used by the generate function (by providing memory and registers
+    # to generate a VM according to the memory contents (e.g. memory size could have been
+    # modified by mutation, but not made effective yet
+    def initialize(self, mem=None, regs=None):
+        if not mem:
+            # initializes from standard values
+            # Populates protected memory
+            for count,elem in enumerate(PROTECTED,0):
+                self.Memory[count]=elem[1]
+            for i in REGS:
+                self.Regs.append(0)
+            start=len(REGS)
+            size=self.Memory[self.ProtSymbols['GENREGS']]
+            for count in range(0,size):
+                self.RegSymbols['R'+str(count)]=start+count
+                self.Regs.append(0)
+            # Set some initial values
+            # The Code Segment starts right after the protected area
+            prot_size=self.get_mem(self.ProtSymbols['PROTECTED'])
+            self.set_reg('CS',prot_size)
+            # The code segment has a size determined as percentage of the non-protected memory
+            mem_size=self.get_mem(self.ProtSymbols['MEMSIZE'])
+            code_pctg=self.get_mem(self.ProtSymbols['CODEPCTG'])
+            code_size=int((mem_size-prot_size)*code_pctg)
+            # The Data Segment starts after the code segment, (the code segment starts right after protected area
+            self.set_reg('DS',prot_size+code_size)
+            # Initializes the Heap Pointer to the start of the Data Segment
+            self.set_reg('HP',prot_size+code_size)
+            # The Stack grows from the bottom of the memory upwards
+            # The SP points to the current head of the stack, so as initially there is nothing in the stack,
+            # it points outside the memory (MEMSIZE)
+            self.set_reg('SP',self.MemSize)
+        else:
+            # initializes from values in memory
+            #todo: should do some checking on boundaries (e.g. protected growing bigger than total memory
+            # Populates protected memory
+            prot_size=mem[self.ProtSymbols['PROTECTED']]
+            for i in range(0,prot_size):
+                self.Memory[i]=mem[i]
+            for i in range(0,len(REGS)):
+                self.Regs.append(regs[i])
+            start=len(REGS)
+            size=mem[self.ProtSymbols['GENREGS']]
+            for count in range(0,size):
+                self.RegSymbols['R'+str(count)]=start+count
+                self.Regs.append(regs[start+count])
+            # Set some initial values
+            # The Code Segment starts right after the protected area
+            prot_size=mem[self.ProtSymbols['PROTECTED']]
+            self.set_reg('CS',prot_size)
+            # The code segment has a size determined as percentage of the non-protected memory
+            mem_size=mem[self.ProtSymbols['MEMSIZE']]
+            code_pctg=mem[self.ProtSymbols['CODEPCTG']]
+            code_size=int((mem_size-prot_size)*code_pctg)
+            # The Data Segment starts after the code segment, (the code segment starts right after protected area
+            self.set_reg('DS',prot_size+code_size)
+            # Initializes the Heap Pointer to the start of the Data Segment
+            self.set_reg('HP',prot_size+code_size)
+            # The Stack grows from the bottom of the memory upwards
+            # The SP points to the current head of the stack, so as initially there is nothing in the stack,
+            # it points outside the memory (MEMSIZE)
+            self.set_reg('SP',mem_size)
+        # some values to accelerate access to memory data
+        self.MaxSteps=self.get_mem(self.ProtSymbols['STEPSCYCLE'])
+        self.StepsLeft=self.MaxSteps    # Controls the execution cycle
 
-        # Set some initial values
-        # The Code Segment starts right after the protected area
-        prot_size=self.get_mem(self.ProtSymbols['PROTECTED'])
-        self.set_reg('CS',prot_size)
-        # The code segment has a size determined as percentage of the non-protected memory
+
+    def generate(self):
         mem_size=self.get_mem(self.ProtSymbols['MEMSIZE'])
-        code_pctg=self.get_mem(self.ProtSymbols['CODEPCTG'])
-        code_size=int((mem_size-prot_size)*code_pctg)
+        C=VM(mem_size,self.Memory,self.Regs)
+        return C
 
-        # The Data Segment starts after the code segment, (the code segment starts right after protected area
-        self.set_reg('DS',prot_size+code_size)
-        # Initializes the Heap Pointer to the start of the Data Segment
-        self.set_reg('HP',prot_size+code_size)
-        # The Stack grows from the bottom of the memory upwards
-        # The SP points to the current head of the stack, so as initially there is nothing in the stack,
-        # it points outside the memory (MEMSIZE)
-        self.set_reg('SP',self.MemSize)
-
-
+    # Returns a clone. Basically creates a new VM and then copies the contents of the registers and memory
+    # doesnt take into account possible mutations to the protected memory (e.g. memsize or # of regs
+    def clone(self):
+        C=VM(self.MemSize)
+        C.Regs=list(self.Regs)
+        C.Memory=list(self.Memory)
+        return C
 
     def set_brand(self,brand):
         self.set_mem(self._brandpos,brand)
@@ -164,6 +222,7 @@ class VM:
         list.sort(key=lambda tup: tup[1])
         return list
 
+    # loads a file in an available memory position
     def load_file(self,file):
         logger.info(file)
         stream=FileStream(file)
@@ -171,7 +230,17 @@ class VM:
         analyzer=Analyzer(stream)
         analyzer.Walk()
         pos=self._compile(analyzer.Context['program'])
+        name=file.split('.')[0]
+        if pos>=0:
+            self.PAT[name]=pos
         return pos
+
+    # files is a list of filenames to load
+    def load_files(self,files):
+        for f in files:
+            p=self.load_file(f)
+            if p<0:
+                logger.error("Unable to load "+f)
 
     # Compiles and stores a program in memory
     # Returns the start address relative to CS
@@ -193,18 +262,58 @@ class VM:
                 return pos
         return -1
 
-        # Sets to start the execution of code at pos
+    # Sets to start the execution of code at pos
+    # pos can be a memory address relative to CS
+    # the name of a program in the PAT
     def run(self,pos):
-        self.set_reg('PC',pos)
+        if isinstance(pos,str):
+            try:
+                addr=self.PAT[pos]
+            except:
+                addr=0
+        else:
+            addr=pos
+        self.set_reg('PS',addr)
+        self.set_reg('PC',addr)
+        self.StepsLeft=self.MaxSteps
 
-    # Executes code at pos
-    def cycle(self,pos):
+    # Executes n steps of code at pos
+    def cycle(self,pos,nsteps):
         self.set_reg('PC',pos)
-        steps=self.get_reg(self._stmdix)
         run=1
-        while steps and run:
+        while nsteps and run:
             run=self.step()
-            steps-=1
+            nsteps-=1
+
+    # Runs the next instruction
+    # Returns 0 in case:
+    #   the instruction is END.
+    #   it has executed more than STEPSCYCLE
+    # Returns 1 otherwise
+    def step(self):
+        if self.StepsLeft==0:
+            self.StepsLeft=self.MaxSteps
+            return 0
+        self.StepsLeft-=1
+        op_code=self._get_pc_code()
+        #symb_op_code=OP_CODES[op_code]
+        symb_op_code=compiler.get_symbol_op_code(op_code)
+        logger.info(symb_op_code)
+        logger.debug(self.show_architecture())
+        try:
+            func=getattr(self,symb_op_code)
+            func()
+            if symb_op_code=='_end':
+                return 0
+            else:
+                return 1
+        except BaseException as e:
+            text="Error: "+str(e)+"\n"
+            text+="OpCode: "+str(op_code)+"\n"
+            text+=self.show_architecture()+"\n"+self.show_memory()
+            logger.error(text)
+            return 0
+
 
     def get_reg(self,idx):
         # Look at this!!
@@ -221,6 +330,11 @@ class VM:
         except  TypeError:
             idx=self.RegSymbols[idx]
             self.Regs[idx]=val
+        except BaseException as e:
+            text="Error: "+str(e)+"\n"
+            text+="Idx: "+str(idx)+" Val: "+str(val)+"\n"
+            text+=self.show_architecture()+"\n"+self.show_memory()
+            logger.error(text)
 
     def set_mem(self,addr,val):
         if addr<0 or addr>=self.MemSize:
@@ -272,20 +386,6 @@ class VM:
         self.set_reg(self._pcidx,dir)
 
 
-    # Runs the next instruction
-    # Returns 0 in case the instruction is END. 1 otherwise
-    def step(self):
-        op_code=self._get_pc_code()
-        symb_op_code=OP_CODES[op_code]
-        logger.info(symb_op_code)
-        logger.debug(self.show_architecture())
-        func=getattr(self,symb_op_code)
-        func()
-        if symb_op_code=='_end':
-            return 0
-        else:
-            return 1
-
     def _push(self,val):
         logger.info(val)
         # SP points to the current head, so first we make it grow
@@ -324,13 +424,23 @@ class VM:
             a+=r+': '+str(self.get_reg(r))+' '
         return a
 
-    def show_memory(self,start=0,end=MEM_SIZE):
+    def show_memory(self,start=0,end=0):
+        if end==0:
+            end=len(self.Memory)
+        a=""
+        for i in range(start,end):
+            if i%8==0:
+                t='\n'+str(i)+': '
+                a+=t.rjust(7)
+            a+=str(self.get_mem(i)).ljust(4)+' '
+        return a
+
+    def show_memory_old(self,start=0,end=MEM_SIZE):
         for i in range(start,end):
             if i%8==0:
                 t='\n'+str(i)+': '
                 print(t.rjust(7),end='')
             print(str(self.get_mem(i)).ljust(4),end=' ')
-
 
 
     # ld1 reg addr
@@ -462,9 +572,11 @@ class VM:
         self.set_reg(reg,val)
 
     # jmp dir
-    # sets the PC to dir relative to the CS
+    # sets the PC to dir relative to the SP
     def _jmp(self):
         dir=self._get_pc_code()
+        sp=self.get_reg(self._spidx)
+        dir+=sp
         self.set_reg(self._pcidx,dir)
 
     # jmpf val
@@ -481,23 +593,27 @@ class VM:
         pc=self.get_reg(self._pcidx)
         self._set_pc(pc-val)
 
+    # Jumps if reg is zero
+    # address is relative to SP
     def _jz(self):
         reg=self._get_pc_code()
-        dir=self._get_pc_code()
         val=self.get_reg(reg)
         if val==0:
+            dir=self._get_pc_code()
+            sp=self.get_reg(self._spidx)
+            dir+=sp
             self._set_pc(dir)
 
+    # Jumps if reg is not zero
+    # address is relative to SP
     def _jnz(self):
         reg=self._get_pc_code()
-        dir=self._get_pc_code()
         val=self.get_reg(reg)
         if val!=0:
+            dir=self._get_pc_code()
+            sp=self.get_reg(self._spidx)
+            dir+=sp
             self._set_pc(dir)
-        else:
-            pass
-
-
 
     def _nop(self):
         pass

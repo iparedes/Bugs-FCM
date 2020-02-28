@@ -27,7 +27,7 @@ class Bug(VM):
     """
 
 
-    def __init__(self,brand=1,cell=None):
+    def __init__(self,cell,brand=1):
 
         # Add bug registers
         # SRR: Search radius. Determines the field of vision of the bug
@@ -58,6 +58,15 @@ class Bug(VM):
         if brand > 1:
             self.set_brand(brand)
 
+    # In the future this function will select what program to activate based on the FCM
+    # by now, we just activate the first program in memory
+    def activate(self):
+        prog=list(self.PAT)[0]
+        self.run(prog)
+
+    def cycle(self,pos,steps=0):
+        steps=self.get_reg(self._stmdix)
+        super().cycle(pos,steps)
 
 
     def _decode_dirs(self,dirs):

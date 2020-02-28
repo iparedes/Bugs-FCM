@@ -8,7 +8,7 @@ import sys
 
 def serializedATN():
     with StringIO() as buf:
-        buf.write("\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\63")
+        buf.write("\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3\64")
         buf.write("\u0081\4\2\t\2\4\3\t\3\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7")
         buf.write("\4\b\t\b\4\t\t\t\4\n\t\n\4\13\t\13\3\2\3\2\3\2\7\2\32")
         buf.write("\n\2\f\2\16\2\35\13\2\3\2\3\2\7\2!\n\2\f\2\16\2$\13\2")
@@ -20,37 +20,37 @@ def serializedATN():
         buf.write("\5\3\5\5\5j\n\5\3\6\3\6\5\6n\n\6\3\7\3\7\5\7r\n\7\3\b")
         buf.write("\3\b\3\t\3\t\5\tx\n\t\3\n\3\n\3\13\6\13}\n\13\r\13\16")
         buf.write("\13~\3\13\2\2\f\2\4\6\b\n\f\16\20\22\24\2\4\3\2\3\13\3")
-        buf.write("\2\r\25\2\u0092\2\33\3\2\2\2\4[\3\2\2\2\6b\3\2\2\2\bi")
+        buf.write("\2\r\26\2\u0092\2\33\3\2\2\2\4[\3\2\2\2\6b\3\2\2\2\bi")
         buf.write("\3\2\2\2\nm\3\2\2\2\fq\3\2\2\2\16s\3\2\2\2\20w\3\2\2\2")
-        buf.write("\22y\3\2\2\2\24|\3\2\2\2\26\27\5\4\3\2\27\30\7\61\2\2")
+        buf.write("\22y\3\2\2\2\24|\3\2\2\2\26\27\5\4\3\2\27\30\7\62\2\2")
         buf.write("\30\32\3\2\2\2\31\26\3\2\2\2\32\35\3\2\2\2\33\31\3\2\2")
         buf.write("\2\33\34\3\2\2\2\34\36\3\2\2\2\35\33\3\2\2\2\36\"\5\4")
-        buf.write("\3\2\37!\7\61\2\2 \37\3\2\2\2!$\3\2\2\2\" \3\2\2\2\"#")
-        buf.write("\3\2\2\2#\3\3\2\2\2$\"\3\2\2\2%&\7 \2\2&\'\5\20\t\2\'")
-        buf.write("(\7*\2\2()\5\6\4\2)\\\3\2\2\2*+\7&\2\2+,\5\f\7\2,-\7*")
-        buf.write("\2\2-.\5\b\5\2.\\\3\2\2\2/\60\7\"\2\2\60\61\5\f\7\2\61")
-        buf.write("\62\7*\2\2\62\63\5\f\7\2\63\\\3\2\2\2\64\65\7\26\2\2\65")
-        buf.write("\66\5\20\t\2\66\67\7*\2\2\678\5\f\7\28\\\3\2\2\29:\7$")
-        buf.write("\2\2:\\\5\f\7\2;<\7#\2\2<\\\5\f\7\2=>\7\32\2\2>\\\5\20")
-        buf.write("\t\2?@\7\27\2\2@\\\5\20\t\2AB\7\33\2\2B\\\7\62\2\2CD\7")
-        buf.write("\35\2\2D\\\5\24\13\2EF\7\34\2\2F\\\5\24\13\2GH\7\36\2")
-        buf.write("\2HI\5\f\7\2IJ\7*\2\2JK\7\62\2\2K\\\3\2\2\2LM\7\37\2\2")
-        buf.write("MN\5\f\7\2NO\7*\2\2OP\7\62\2\2P\\\3\2\2\2Q\\\7%\2\2R\\")
-        buf.write("\7(\2\2S\\\7)\2\2TU\7\'\2\2U\\\5\f\7\2V\\\7\30\2\2W\\")
-        buf.write("\7\31\2\2X\\\7!\2\2YZ\7\62\2\2Z\\\7/\2\2[%\3\2\2\2[*\3")
-        buf.write("\2\2\2[/\3\2\2\2[\64\3\2\2\2[9\3\2\2\2[;\3\2\2\2[=\3\2")
-        buf.write("\2\2[?\3\2\2\2[A\3\2\2\2[C\3\2\2\2[E\3\2\2\2[G\3\2\2\2")
-        buf.write("[L\3\2\2\2[Q\3\2\2\2[R\3\2\2\2[S\3\2\2\2[T\3\2\2\2[V\3")
-        buf.write("\2\2\2[W\3\2\2\2[X\3\2\2\2[Y\3\2\2\2\\\5\3\2\2\2]c\5\b")
-        buf.write("\5\2^_\7+\2\2_`\5\24\13\2`a\7,\2\2ac\3\2\2\2b]\3\2\2\2")
-        buf.write("b^\3\2\2\2c\7\3\2\2\2dj\5\n\6\2ef\7-\2\2fg\5\n\6\2gh\7")
-        buf.write(".\2\2hj\3\2\2\2id\3\2\2\2ie\3\2\2\2j\t\3\2\2\2kn\5\24")
-        buf.write("\13\2ln\5\f\7\2mk\3\2\2\2ml\3\2\2\2n\13\3\2\2\2or\5\20")
-        buf.write("\t\2pr\5\22\n\2qo\3\2\2\2qp\3\2\2\2r\r\3\2\2\2st\t\2\2")
-        buf.write("\2t\17\3\2\2\2ux\5\16\b\2vx\7\f\2\2wu\3\2\2\2wv\3\2\2")
-        buf.write("\2x\21\3\2\2\2yz\t\3\2\2z\23\3\2\2\2{}\7\60\2\2|{\3\2")
-        buf.write("\2\2}~\3\2\2\2~|\3\2\2\2~\177\3\2\2\2\177\25\3\2\2\2\13")
-        buf.write("\33\"[bimqw~")
+        buf.write("\3\2\37!\7\62\2\2 \37\3\2\2\2!$\3\2\2\2\" \3\2\2\2\"#")
+        buf.write("\3\2\2\2#\3\3\2\2\2$\"\3\2\2\2%&\7!\2\2&\'\5\20\t\2\'")
+        buf.write("(\7+\2\2()\5\6\4\2)\\\3\2\2\2*+\7\'\2\2+,\5\f\7\2,-\7")
+        buf.write("+\2\2-.\5\b\5\2.\\\3\2\2\2/\60\7#\2\2\60\61\5\f\7\2\61")
+        buf.write("\62\7+\2\2\62\63\5\f\7\2\63\\\3\2\2\2\64\65\7\27\2\2\65")
+        buf.write("\66\5\20\t\2\66\67\7+\2\2\678\5\f\7\28\\\3\2\2\29:\7%")
+        buf.write("\2\2:\\\5\f\7\2;<\7$\2\2<\\\5\f\7\2=>\7\33\2\2>\\\5\20")
+        buf.write("\t\2?@\7\30\2\2@\\\5\20\t\2AB\7\34\2\2B\\\7\63\2\2CD\7")
+        buf.write("\36\2\2D\\\5\24\13\2EF\7\35\2\2F\\\5\24\13\2GH\7\37\2")
+        buf.write("\2HI\5\f\7\2IJ\7+\2\2JK\7\63\2\2K\\\3\2\2\2LM\7 \2\2M")
+        buf.write("N\5\f\7\2NO\7+\2\2OP\7\63\2\2P\\\3\2\2\2Q\\\7&\2\2R\\")
+        buf.write("\7)\2\2S\\\7*\2\2TU\7(\2\2U\\\5\f\7\2V\\\7\31\2\2W\\\7")
+        buf.write("\32\2\2X\\\7\"\2\2YZ\7\63\2\2Z\\\7\60\2\2[%\3\2\2\2[*")
+        buf.write("\3\2\2\2[/\3\2\2\2[\64\3\2\2\2[9\3\2\2\2[;\3\2\2\2[=\3")
+        buf.write("\2\2\2[?\3\2\2\2[A\3\2\2\2[C\3\2\2\2[E\3\2\2\2[G\3\2\2")
+        buf.write("\2[L\3\2\2\2[Q\3\2\2\2[R\3\2\2\2[S\3\2\2\2[T\3\2\2\2[")
+        buf.write("V\3\2\2\2[W\3\2\2\2[X\3\2\2\2[Y\3\2\2\2\\\5\3\2\2\2]c")
+        buf.write("\5\b\5\2^_\7,\2\2_`\5\24\13\2`a\7-\2\2ac\3\2\2\2b]\3\2")
+        buf.write("\2\2b^\3\2\2\2c\7\3\2\2\2dj\5\n\6\2ef\7.\2\2fg\5\n\6\2")
+        buf.write("gh\7/\2\2hj\3\2\2\2id\3\2\2\2ie\3\2\2\2j\t\3\2\2\2kn\5")
+        buf.write("\24\13\2ln\5\f\7\2mk\3\2\2\2ml\3\2\2\2n\13\3\2\2\2or\5")
+        buf.write("\20\t\2pr\5\22\n\2qo\3\2\2\2qp\3\2\2\2r\r\3\2\2\2st\t")
+        buf.write("\2\2\2t\17\3\2\2\2ux\5\16\b\2vx\7\f\2\2wu\3\2\2\2wv\3")
+        buf.write("\2\2\2x\21\3\2\2\2yz\t\3\2\2z\23\3\2\2\2{}\7\61\2\2|{")
+        buf.write("\3\2\2\2}~\3\2\2\2~|\3\2\2\2~\177\3\2\2\2\177\25\3\2\2")
+        buf.write("\2\13\33\"[bimqw~")
         return buf.getvalue()
 
 
@@ -66,7 +66,7 @@ class mvasmParser ( Parser ):
 
     literalNames = [ "<INVALID>", "'R1'", "'R2'", "'R3'", "'R4'", "'R5'", 
                      "'R6'", "'R7'", "'R8'", "'R9'", "'SRF'", "'CS'", "'CH'", 
-                     "'DS'", "'PC'", "'SP'", "'SRR'", "'DRS'", "'NRG'", 
+                     "'DS'", "'PC'", "'SP'", "'PS'", "'SRR'", "'DRS'", "'NRG'", 
                      "'STM'", "'ADD'", "'DEC'", "'EAT'", "'END'", "'INC'", 
                      "'JMP'", "'JMPB'", "'JMPF'", "'JZ'", "'JNZ'", "'LD'", 
                      "'NOP'", "'MOV'", "'POP'", "'PSH'", "'SRCF'", "'ST'", 
@@ -78,11 +78,11 @@ class mvasmParser ( Parser ):
                       "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
                       "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
                       "<INVALID>", "<INVALID>", "<INVALID>", "<INVALID>", 
-                      "ADD", "DEC", "EAT", "END", "INC", "JMP", "JMPB", 
-                      "JMPF", "JZ", "JNZ", "LD", "NOP", "MOV", "POP", "PSH", 
-                      "SRCF", "ST", "WLK", "WLKT", "WLKW", "COMMA", "OPAR", 
-                      "CPAR", "OBRACE", "CBRACE", "COLON", "DIGIT", "NEWLINE", 
-                      "VARIABLE", "WS" ]
+                      "<INVALID>", "ADD", "DEC", "EAT", "END", "INC", "JMP", 
+                      "JMPB", "JMPF", "JZ", "JNZ", "LD", "NOP", "MOV", "POP", 
+                      "PSH", "SRCF", "ST", "WLK", "WLKT", "WLKW", "COMMA", 
+                      "OPAR", "CPAR", "OBRACE", "CBRACE", "COLON", "DIGIT", 
+                      "NEWLINE", "VARIABLE", "WS" ]
 
     RULE_program = 0
     RULE_instr = 1
@@ -118,36 +118,37 @@ class mvasmParser ( Parser ):
     T__16=17
     T__17=18
     T__18=19
-    ADD=20
-    DEC=21
-    EAT=22
-    END=23
-    INC=24
-    JMP=25
-    JMPB=26
-    JMPF=27
-    JZ=28
-    JNZ=29
-    LD=30
-    NOP=31
-    MOV=32
-    POP=33
-    PSH=34
-    SRCF=35
-    ST=36
-    WLK=37
-    WLKT=38
-    WLKW=39
-    COMMA=40
-    OPAR=41
-    CPAR=42
-    OBRACE=43
-    CBRACE=44
-    COLON=45
-    DIGIT=46
-    NEWLINE=47
-    VARIABLE=48
-    WS=49
+    T__19=20
+    ADD=21
+    DEC=22
+    EAT=23
+    END=24
+    INC=25
+    JMP=26
+    JMPB=27
+    JMPF=28
+    JZ=29
+    JNZ=30
+    LD=31
+    NOP=32
+    MOV=33
+    POP=34
+    PSH=35
+    SRCF=36
+    ST=37
+    WLK=38
+    WLKT=39
+    WLKW=40
+    COMMA=41
+    OPAR=42
+    CPAR=43
+    OBRACE=44
+    CBRACE=45
+    COLON=46
+    DIGIT=47
+    NEWLINE=48
+    VARIABLE=49
+    WS=50
 
     def __init__(self, input:TokenStream, output:TextIO = sys.stdout):
         super().__init__(input, output)
@@ -965,7 +966,7 @@ class mvasmParser ( Parser ):
             self.state = 96
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [mvasmParser.T__0, mvasmParser.T__1, mvasmParser.T__2, mvasmParser.T__3, mvasmParser.T__4, mvasmParser.T__5, mvasmParser.T__6, mvasmParser.T__7, mvasmParser.T__8, mvasmParser.T__9, mvasmParser.T__10, mvasmParser.T__11, mvasmParser.T__12, mvasmParser.T__13, mvasmParser.T__14, mvasmParser.T__15, mvasmParser.T__16, mvasmParser.T__17, mvasmParser.T__18, mvasmParser.OBRACE, mvasmParser.DIGIT]:
+            if token in [mvasmParser.T__0, mvasmParser.T__1, mvasmParser.T__2, mvasmParser.T__3, mvasmParser.T__4, mvasmParser.T__5, mvasmParser.T__6, mvasmParser.T__7, mvasmParser.T__8, mvasmParser.T__9, mvasmParser.T__10, mvasmParser.T__11, mvasmParser.T__12, mvasmParser.T__13, mvasmParser.T__14, mvasmParser.T__15, mvasmParser.T__16, mvasmParser.T__17, mvasmParser.T__18, mvasmParser.T__19, mvasmParser.OBRACE, mvasmParser.DIGIT]:
                 localctx = mvasmParser.ValmemContext(self, localctx)
                 self.enterOuterAlt(localctx, 1)
                 self.state = 91
@@ -1060,7 +1061,7 @@ class mvasmParser ( Parser ):
             self.state = 103
             self._errHandler.sync(self)
             token = self._input.LA(1)
-            if token in [mvasmParser.T__0, mvasmParser.T__1, mvasmParser.T__2, mvasmParser.T__3, mvasmParser.T__4, mvasmParser.T__5, mvasmParser.T__6, mvasmParser.T__7, mvasmParser.T__8, mvasmParser.T__9, mvasmParser.T__10, mvasmParser.T__11, mvasmParser.T__12, mvasmParser.T__13, mvasmParser.T__14, mvasmParser.T__15, mvasmParser.T__16, mvasmParser.T__17, mvasmParser.T__18, mvasmParser.DIGIT]:
+            if token in [mvasmParser.T__0, mvasmParser.T__1, mvasmParser.T__2, mvasmParser.T__3, mvasmParser.T__4, mvasmParser.T__5, mvasmParser.T__6, mvasmParser.T__7, mvasmParser.T__8, mvasmParser.T__9, mvasmParser.T__10, mvasmParser.T__11, mvasmParser.T__12, mvasmParser.T__13, mvasmParser.T__14, mvasmParser.T__15, mvasmParser.T__16, mvasmParser.T__17, mvasmParser.T__18, mvasmParser.T__19, mvasmParser.DIGIT]:
                 localctx = mvasmParser.MemRelContext(self, localctx)
                 self.enterOuterAlt(localctx, 1)
                 self.state = 98
@@ -1129,7 +1130,7 @@ class mvasmParser ( Parser ):
                 self.state = 105
                 self.number()
                 pass
-            elif token in [mvasmParser.T__0, mvasmParser.T__1, mvasmParser.T__2, mvasmParser.T__3, mvasmParser.T__4, mvasmParser.T__5, mvasmParser.T__6, mvasmParser.T__7, mvasmParser.T__8, mvasmParser.T__9, mvasmParser.T__10, mvasmParser.T__11, mvasmParser.T__12, mvasmParser.T__13, mvasmParser.T__14, mvasmParser.T__15, mvasmParser.T__16, mvasmParser.T__17, mvasmParser.T__18]:
+            elif token in [mvasmParser.T__0, mvasmParser.T__1, mvasmParser.T__2, mvasmParser.T__3, mvasmParser.T__4, mvasmParser.T__5, mvasmParser.T__6, mvasmParser.T__7, mvasmParser.T__8, mvasmParser.T__9, mvasmParser.T__10, mvasmParser.T__11, mvasmParser.T__12, mvasmParser.T__13, mvasmParser.T__14, mvasmParser.T__15, mvasmParser.T__16, mvasmParser.T__17, mvasmParser.T__18, mvasmParser.T__19]:
                 self.enterOuterAlt(localctx, 2)
                 self.state = 106
                 self.reg()
@@ -1187,7 +1188,7 @@ class mvasmParser ( Parser ):
                 self.state = 109
                 self.wrt_reg()
                 pass
-            elif token in [mvasmParser.T__10, mvasmParser.T__11, mvasmParser.T__12, mvasmParser.T__13, mvasmParser.T__14, mvasmParser.T__15, mvasmParser.T__16, mvasmParser.T__17, mvasmParser.T__18]:
+            elif token in [mvasmParser.T__10, mvasmParser.T__11, mvasmParser.T__12, mvasmParser.T__13, mvasmParser.T__14, mvasmParser.T__15, mvasmParser.T__16, mvasmParser.T__17, mvasmParser.T__18, mvasmParser.T__19]:
                 self.enterOuterAlt(localctx, 2)
                 self.state = 110
                 self.prt_reg()
@@ -1332,7 +1333,7 @@ class mvasmParser ( Parser ):
             self.enterOuterAlt(localctx, 1)
             self.state = 119
             _la = self._input.LA(1)
-            if not((((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << mvasmParser.T__10) | (1 << mvasmParser.T__11) | (1 << mvasmParser.T__12) | (1 << mvasmParser.T__13) | (1 << mvasmParser.T__14) | (1 << mvasmParser.T__15) | (1 << mvasmParser.T__16) | (1 << mvasmParser.T__17) | (1 << mvasmParser.T__18))) != 0)):
+            if not((((_la) & ~0x3f) == 0 and ((1 << _la) & ((1 << mvasmParser.T__10) | (1 << mvasmParser.T__11) | (1 << mvasmParser.T__12) | (1 << mvasmParser.T__13) | (1 << mvasmParser.T__14) | (1 << mvasmParser.T__15) | (1 << mvasmParser.T__16) | (1 << mvasmParser.T__17) | (1 << mvasmParser.T__18) | (1 << mvasmParser.T__19))) != 0)):
                 self._errHandler.recoverInline(self)
             else:
                 self._errHandler.reportMatch(self)

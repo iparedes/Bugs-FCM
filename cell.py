@@ -1,6 +1,7 @@
 import random
 from taxicab import TCPos
 
+
 DIRS=['N','E','S','W']
 SHIFTS=[[-1,0],[0,1],[1,0],[0,-1]]
 ANTA={'N':'S','E':'W','S':'N','W':'E'}
@@ -9,7 +10,7 @@ ANTA={'N':'S','E':'W','S':'N','W':'E'}
 FOOD_RATE=0.5
 FOOD_THINGS_INDEX=1
 
-class cell:
+class Cell:
 
     def __init__(self):
         # In order: N, W, E, S
@@ -71,7 +72,7 @@ class cell:
             dirs.append('E')
         return dirs
 
-class board:
+class Board:
 
     def __init__(self,width,height):
         """
@@ -83,7 +84,7 @@ class board:
         """
         self.height=height
         self.width=width
-        self.b=[[cell() for x in range(width)] for y in range(height)]
+        self.b=[[Cell() for x in range(width)] for y in range(height)]
 
         # Just for testing
         cont=0
@@ -107,6 +108,12 @@ class board:
     # p: [r,c]
     def get_cell(self,p):
         return self.b[p[0]][p[1]]
+
+    def get_rand_cell(self):
+        row=random.randrange(self.height)
+        col=random.randrange(self.width)
+        return self.b[row][col]
+
 
     # two lists [row,col]
     # ret: a coord inside the board (the edges are adjacent to the opposite)

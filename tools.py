@@ -1,5 +1,5 @@
 import logging
-
+import random
 
 logger = logging.getLogger(__name__)
 FORMAT = "[%(funcName)20s() ] %(message)s"
@@ -17,3 +17,6 @@ def setup_logger(name, log_file, level=logging.INFO):
 
     return logger
 
+
+def init_tools():
+    random.seed()
