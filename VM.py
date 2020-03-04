@@ -1,5 +1,4 @@
 import logging
-from analyzer import *
 import tools
 import compiler
 
@@ -53,7 +52,7 @@ class VM:
         self.Memory=[0]*self.MemSize # todo: initialize to random to give more chances in mutation. This will require
                                      # todo: a redo of the load-find-blocks mechanism. Maybe using a Program Allocation Table
 
-        self.PAT={} # Programs Allocation Table. Contains the memory addresses that the programs have been loaded in
+        self.PAT=[] # Program Allocation Table holds tuples (pos,size) for each program in memory
         # Tries to accelerate access to registers
         self._pcidx=REGS.index('PC')
         self._csidx=REGS.index('CS')
@@ -148,6 +147,7 @@ class VM:
     def generate(self):
         mem_size=self.get_mem(self.ProtSymbols['MEMSIZE'])
         C=VM(mem_size,self.Memory,self.Regs)
+        C.PAT=self.PAT
         return C
 
     # Returns a clone. Basically creates a new VM and then copies the contents of the registers and memory
@@ -180,87 +180,128 @@ class VM:
                 return 0
         return i
 
-    # Returns the size of the free block that starts on pos
-    def size_of_block(self,pos):
+    # # This was used when free memory was supposed to be zero. Not anymore.
+    # # Now we use PAT to identify free blocks
+    # # Returns the size of the free block that starts on pos
+    # def size_of_block(self,pos):
+    #     cs=self.get_reg('CS')
+    #     ds=self.get_reg('DS')
+    #     i=pos
+    #     size=0
+    #     v=self.get_mem(i)
+    #     if v!=0:
+    #         return size
+    #     else:
+    #         while v==0 and i<(ds-1):
+    #             i+=1
+    #             size+=1
+    #             v=self.get_mem(i)
+    #         return size
+
+    # # Same as the previous one
+    # # Returns list with free memory blocks (absolute pos,size)
+    # def find_blocks(self):
+    #     cs=self.get_reg('CS')
+    #     ds=self.get_reg('DS')
+    #     list=[]
+    #     pos=cs
+    #     while pos<(ds-1):
+    #         size=self.size_of_block(pos)
+    #         if size>0:
+    #             list.append((pos,size))
+    #             pos+=size
+    #         else:
+    #             pos+=1
+    #     # checks if there is a turnaround block
+    #     l=len(list)
+    #     if l>1:
+    #         first=list[0]
+    #         last=list[l-1]
+    #         end=last[0]+last[1]
+    #         if (first[0]==cs) and (end==(ds-1)):
+    #             list.pop()
+    #             list.pop(l-2)
+    #             list.append((last[0],last[1]+first[1]))
+    #     list.sort(key=lambda tup: tup[1])
+    #     return list
+
+
+    def _find_free_blocks(self):
+        l=self.PAT
         cs=self.get_reg('CS')
         ds=self.get_reg('DS')
-        i=pos
-        size=0
-        v=self.get_mem(i)
-        if v!=0:
-            return size
+        # Number of positions in the memory
+        length=ds-cs
+        # Clean memory
+        if not l:
+            return[(0,length)]
         else:
-            while v==0 and i<(ds-1):
-                i+=1
-                size+=1
-                v=self.get_mem(i)
-            return size
+            l.sort(key=lambda tup: tup[0])
+            # free spaces
+            h=[]
+            # bottom is the leftmost index of the block
+            bottom=0
+            top=length-1
+            for p in l:
+                init=p[0]
+                if init==bottom:
+                    # block starts at the bottom
+                    bottom+=p[1]
+                else:
+                    # there is space before the block
+                    h.append((bottom,p[0]-bottom))
+                    bottom=p[0]+p[1]
+            if bottom<top:
+                # there is space after the last block
+                h.append((bottom,top-bottom+1))
+            # Memory is circular. Let's check if there is continuity
+            if h[0][0]==0 and (h[-1][0]+h[-1][1])==length:
+                first=h.pop(0)
+                last=h.pop()
+                h.append((last[0],first[1]+last[1]))
+            return h
 
-    # Returns list with free memory blocks (absolute pos,size)
-    def find_blocks(self):
-        cs=self.get_reg('CS')
-        ds=self.get_reg('DS')
-        list=[]
-        pos=cs
-        while pos<(ds-1):
-            size=self.size_of_block(pos)
-            if size>0:
-                list.append((pos,size))
-                pos+=size
-            else:
-                pos+=1
-        # checks if there is a turnaround block
-        l=len(list)
-        if l>1:
-            first=list[0]
-            last=list[l-1]
-            end=last[0]+last[1]
-            if (first[0]==cs) and (end==(ds-1)):
-                list.pop()
-                list.pop(l-2)
-                list.append((last[0],last[1]+first[1]))
-        list.sort(key=lambda tup: tup[1])
-        return list
 
-    # loads a file in an available memory position
-    def load_file(self,file):
-        logger.info(file)
-        stream=FileStream(file)
-        #stream = antlr4.InputStream("ADD R1,R2\n")
-        analyzer=Analyzer(stream)
-        analyzer.Walk()
-        pos=self._compile(analyzer.Context['program'])
-        name=file.split('.')[0]
-        if pos>=0:
-            self.PAT[name]=pos
-        return pos
-
-    # files is a list of filenames to load
-    def load_files(self,files):
-        for f in files:
-            p=self.load_file(f)
-            if p<0:
-                logger.error("Unable to load "+f)
-
-    # Compiles and stores a program in memory
-    # Returns the start address relative to CS
-    # if the program cannot be loaded returns -1
+    # todo: redo the loading mechanism. Now should be based on the PAT contents
+    # Compiles a program in pseudocode to be loaded in memory
     def _compile(self, program):
         Context={}
         Context['REGISTERS']=self.RegSymbols
         C=Compiler(program, Context)
-        length_prog=len(C.bytecode)
-        blocks=self.find_blocks()
-        for b in blocks:
-            if b[1]>=length_prog:
-                pos=b[0]
-                # Loads the program in an absolute address...
-                self.set_mem_blk(pos,C.bytecode)
-                # ...but returns the address relative to CS
+        return C.bytecode
+
+
+    # Loads a compiled program in memory
+    # Returns the start address relative to CS
+    # if the program cannot be loaded returns -1
+    def _load(self,program):
+        # Finds a suitable block
+        length_prog=len(program)
+        free_blocks=self._find_free_blocks()
+        pos=-1
+        # Sort from smaller to bigger block
+        free_blocks.sort(key=lambda tup: tup[1])
+        for h in free_blocks:
+            if h[1]>=length_prog:
+                # We found space to load the program
+                pos=h[0]
                 cs=self.get_reg('CS')
-                pos-=cs
-                return pos
-        return -1
+                self.set_mem_blk(cs+pos,program)
+                self.PAT.append((pos,length_prog))
+        return pos
+
+
+        # blocks=self.find_blocks()
+        # for b in blocks:
+        #     if b[1]>=length_prog:
+        #         pos=b[0]
+        #         # Loads the program in an absolute address...
+        #         self.set_mem_blk(pos,C.bytecode)
+        #         # ...but returns the address relative to CS
+        #         cs=self.get_reg('CS')
+        #         pos-=cs
+        #         return pos
+        # return -1
 
     # Sets to start the execution of code at pos
     # pos can be a memory address relative to CS
@@ -278,12 +319,18 @@ class VM:
         self.StepsLeft=self.MaxSteps
 
     # Executes n steps of code at pos
+    # nsteps=0 means execute continuously
     def cycle(self,pos,nsteps):
         self.set_reg('PC',pos)
         run=1
         while nsteps and run:
             run=self.step()
             nsteps-=1
+
+    def execute_til_end(self):
+        a=self.step()
+        while(a):
+            a=self.step()
 
     # Runs the next instruction
     # Returns 0 in case:
@@ -342,11 +389,13 @@ class VM:
         if addr>=self.get_reg('CS'):
             self.Memory[addr]=val
 
+    # addr is an absolute memory address
     def get_mem(self,addr):
         if addr<0 or addr>=self.MemSize:
             addr=addr%self.MemSize
         return self.Memory[addr]
 
+    # addr is an absolute memory address
     def set_mem_blk(self,addr,blk):
         cont=addr
         while blk:

@@ -1,4 +1,6 @@
 from VM import *
+from analyzer import *
+from Brain import *
 import cell
 import random
 
@@ -8,6 +10,14 @@ STAMINA=50
 
 # Coded in five lower bits CWSEN
 CODE_DIRS={'N':1,'E':2,'S':4,'W':8,'C':16}
+
+# The bug has a Fuzzy Cognitive Map to determine what actions to activate
+# Some concepts are inputs (sensors). These are only origin of edges, and are related to a register in the VM.
+#   These are equivalent to senses in the bug, every time that the FCM is activated, the values of the
+#   concept are updated according to the value in the register
+# Other concepts, that terminate edges, may be associated to a piece of code that is executed if the concept
+#   is activated
+
 
 class Bug(VM):
 
@@ -40,7 +50,7 @@ class Bug(VM):
         global REGS
         REGS+=nr
 
-        VM.__init__(self)
+        super().__init__()
 
         self._srridx=REGS.index('SRR')
         self._srfidx=REGS.index('SRF')
@@ -55,14 +65,72 @@ class Bug(VM):
 
         self.MyCell=cell
         self.MyCell.bug_in(self)
+        self.Brain=None
+        self.Running=0 # If 0 is not running a program and can activate the brain
         if brand > 1:
             self.set_brand(brand)
+
+    # loads a file with one or more subprograms in the bug
+    def load_file(self,file):
+        logger.info(file)
+        stream=FileStream(file)
+        #stream = antlr4.InputStream("ADD R1,R2\n")
+        analyzer=Analyzer(stream)
+        analyzer.Walk()
+        # todo: Get it here - this contains info to:1-compila and load program in memory 2-build the FCM
+        # At this point, analyzer.Context['program'] is a list of dictionaries, each of one representing a program
+        # and containing metadata and the sequence of pseudocode
+        # {'MemPointer','prog_type','prog_name','Sequence','reg'}
+        self.Programs=analyzer.Context['program']
+        for p in self.Programs:
+            # Compile into memory and add the start address as metadata
+            prog=self._compile(p['Sequence'])
+            pos=self._load(prog)
+            # Add a new key with the start address of the program
+            p['pos']=pos
+        self.Brain=Brain(self.Programs)
+        #self.Programs=self._compile(analyzer.Context['program'])
+
+    # # files is a list of filenames to load
+    # def load_files(self,files):
+    #     for f in files:
+    #         p=self.load_file(f)
+    #         if p<0:
+    #             logger.error("Unable to load "+f)
+
+
+    def step(self):
+        if self.Running:
+            self.Running=super().step()
+        else:
+            self.Running=1
+            self.activate()
+            self.Running=super().step()
+
 
     # In the future this function will select what program to activate based on the FCM
     # by now, we just activate the first program in memory
     def activate(self):
-        prog=list(self.PAT)[0]
-        self.run(prog)
+        #prog=list(self.PAT)[0]
+        #self.run(prog)
+
+        # todo: need to finish this
+        # 1-Execute sensors code
+        for s in self.Brain.sensors:
+            self.run(s['pos'])
+            self.execute_til_end()
+            reg=s['reg']
+            val=self.get_reg(reg)
+            idx=s['idx']
+            self.Brain.set_concept_value(idx,val)
+        # 2-Update concepts
+        self.Brain.update_concepts_values()
+        # 3-Select winner and return memory pos to execute
+        winner=self.Brain.max_actor()
+        pos=self.Brain.actors[winner]['pos']
+        self.run(pos)
+        # after this, in the next step, the winner code will be executed
+        # The code is executed until it ends, when it ends, the bug can activate again
 
     def cycle(self,pos,steps=0):
         steps=self.get_reg(self._stmdix)

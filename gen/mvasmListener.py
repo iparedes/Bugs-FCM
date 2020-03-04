@@ -8,12 +8,30 @@ else:
 # This class defines a complete listener for a parse tree produced by mvasmParser.
 class mvasmListener(ParseTreeListener):
 
+    # Enter a parse tree produced by mvasmParser#programs.
+    def enterPrograms(self, ctx:mvasmParser.ProgramsContext):
+        pass
+
+    # Exit a parse tree produced by mvasmParser#programs.
+    def exitPrograms(self, ctx:mvasmParser.ProgramsContext):
+        pass
+
+
     # Enter a parse tree produced by mvasmParser#program.
     def enterProgram(self, ctx:mvasmParser.ProgramContext):
         pass
 
     # Exit a parse tree produced by mvasmParser#program.
     def exitProgram(self, ctx:mvasmParser.ProgramContext):
+        pass
+
+
+    # Enter a parse tree produced by mvasmParser#prog_type.
+    def enterProg_type(self, ctx:mvasmParser.Prog_typeContext):
+        pass
+
+    # Exit a parse tree produced by mvasmParser#prog_type.
+    def exitProg_type(self, ctx:mvasmParser.Prog_typeContext):
         pass
 
 
@@ -176,15 +194,6 @@ class mvasmListener(ParseTreeListener):
 
     # Exit a parse tree produced by mvasmParser#instrEAT.
     def exitInstrEAT(self, ctx:mvasmParser.InstrEATContext):
-        pass
-
-
-    # Enter a parse tree produced by mvasmParser#instrEnd.
-    def enterInstrEnd(self, ctx:mvasmParser.InstrEndContext):
-        pass
-
-    # Exit a parse tree produced by mvasmParser#instrEnd.
-    def exitInstrEnd(self, ctx:mvasmParser.InstrEndContext):
         pass
 
 

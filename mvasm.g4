@@ -1,9 +1,13 @@
 grammar mvasm;
 
+programs : program+
+         ;
 
-program : (instr NEWLINE)* instr NEWLINE*
+program : prog_type NEWLINE (instr NEWLINE)* instr NEWLINE* END NEWLINE
         ;
 
+prog_type   :   SENSOR VARIABLE COMMA reg | ACTOR VARIABLE
+            ;
 
 instr   :   LD wrt_reg COMMA val    #instrLD
         |   ST reg COMMA mem        #instrST
@@ -23,7 +27,6 @@ instr   :   LD wrt_reg COMMA val    #instrLD
         |   WLKW                    #instrwlkW
         |   WLK reg                 #instrWLK
         |   EAT                     #instrEAT
-        |   END                     #instrEnd
         |   NOP                     #instrNOP
         |   VARIABLE COLON          #instrLabel
         ;
@@ -69,7 +72,8 @@ LD  :   'LD';
 NOP :   'NOP';
 MOV :   'MOV';
 POP :   'POP';
-PSH :   'PSH';
+PROGRAM :   'PROGRAM';
+PSH :   'PUSH';
 SRCF:   'SRCF';
 ST  :   'ST';
 WLK :   'WLK';
@@ -83,6 +87,9 @@ OBRACE  :   '{';
 CBRACE  :   '}';
 COLON   :   ':';
 DIGIT   :   [0-9];
+SENSOR  :   'SENSOR';
+ACTOR   :   'ACTOR';
+
 
 NEWLINE   : '\r' '\n' | '\n' | '\r';
 

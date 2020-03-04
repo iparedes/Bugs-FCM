@@ -9,35 +9,85 @@ class Sem(mvasmListener):
 
     def __init__(self, context):
         self.MemPointer = 0
-        self.Sequence = []
+        self.Programs=[]    # List of dictionaries containing
+                            # {prog_type:(0-sensor|1-actor) prog_name, sequence[], maybe a register}
+        self.Sequence = [] # stores the sequence of operations and operands of each program
         self.Labels = {}
         self.Context = context
+        self.nProgs=0 # Index of the current subprogram
 
     def add(self, val):
-        self.Sequence.append(val)
+        self.Programs[self.nProgs]['Sequence'].append(val)
 
     def pop(self):
-        a = self.Sequence.pop()
+        a = self.Programs[self.nProgs]['Sequence'].pop()
         return a
 
-        # Enter a parse tree produced by subleqasmParser#program.
 
-    def enterProgram(self, ctx: mvasmParser.ProgramContext):
+    # Enter a parse tree produced by mvasmParser#programs.
+    def enterPrograms(self, ctx:mvasmParser.ProgramsContext):
         logger.info("")
+        self.nProgs=0
+
+    # Exit a parse tree produced by mvasmParser#programs.
+    def exitPrograms(self, ctx:mvasmParser.ProgramsContext):
+        logger.info("")
+        if self.Context['stage']==2:
+            # Returns all the shebang of programs in the attribute program of the context
+            self.Context['program'] = self.Programs
+
+
+
+    # Enter a parse tree produced by subleqasmParser#program.
+    def enterProgram(self, ctx: mvasmParser.ProgramContext):
+        logger.info("Stage "+str(self.Context['stage']))
         if self.Context['stage']==1:
-            self.MemPointer = 0
+            self.Programs.append({})
+            self.Programs[self.nProgs]['MemPointer']= 0
+        else:
+            self.Programs[self.nProgs]['Sequence']=[]
 
     # Exit a parse tree produced by mvasmParser#program.
     def exitProgram(self, ctx: mvasmParser.ProgramContext):
         logger.info("")
+        if self.Context['stage'] == 1:
+            self.Programs[self.nProgs]['MemPointer'] += 1
+        else:
+            self.add("END")
+        self.nProgs+=1
+
+    # TODO: read the subprgram name and use it on exit program to create a dictionary
+    # TODO: need to make all the experiment for a complex program
+
+    # Enter a parse tree produced by mvasmParser#prog_type.
+    def enterProg_type(self, ctx:mvasmParser.Prog_typeContext):
+        logger.info(ctx.getText())
+
+        if self.Context['stage']==1:
+            tipo=ctx.children[0].getText()
+            name=ctx.children[1].getText()
+            self.Programs[self.nProgs]['prog_type']=tipo
+            self.Programs[self.nProgs]['prog_name']=name
+            if tipo=='SENSOR':
+                reg=ctx.children[3].getText()
+                self.Programs[self.nProgs]['reg']=reg
+
+
+    # Exit a parse tree produced by mvasmParser#prog_type.
+    def exitProg_type(self, ctx:mvasmParser.Prog_typeContext):
+        logger.info(ctx.getText())
         if self.Context['stage'] == 2:
-            self.Context['program'] = self.Sequence
+            # if the program is type Sensor...
+            if self.Programs[self.nProgs]['prog_type']=='SENSOR':
+                # ...we dont need the REG x in the sequence (already took care of it in enterProg_type
+                self.pop()
+                self.pop()
 
     # Enter a parse tree produced by mvasmParser#instrEAT.
     def enterInstrEAT(self, ctx:mvasmParser.InstrEATContext):
         logger.info(ctx.getText())
         if self.Context['stage'] == 1:
-            self.MemPointer += 1
+            self.Programs[self.nProgs]['MemPointer'] += 1
         else:
             self.add("EAT")
 
@@ -45,24 +95,11 @@ class Sem(mvasmListener):
     def exitInstrEAT(self, ctx:mvasmParser.InstrEATContext):
         pass
 
-
-    # Enter a parse tree produced by mvasmParser#instrEnd.
-    def enterInstrEnd(self, ctx: mvasmParser.InstrEndContext):
-        logger.info(ctx.getText())
-        if self.Context['stage'] == 1:
-            self.MemPointer += 1
-        else:
-            self.add("END")
-
-    # Exit a parse tree produced by mvasmParser#instrEnd.
-    def exitInstrEnd(self, ctx: mvasmParser.InstrEndContext):
-        pass
-
     # Enter a parse tree produced by mvasmParser#instrLD.
     def enterInstrLD(self, ctx: mvasmParser.InstrLDContext):
         logger.info(ctx.getText())
         if self.Context['stage'] == 1:
-            self.MemPointer += 3
+            self.Programs[self.nProgs]['MemPointer'] += 3
         else:
             self.add("LD")
 
@@ -74,7 +111,7 @@ class Sem(mvasmListener):
     def enterInstrNOP(self, ctx:mvasmParser.InstrNOPContext):
         logger.info(ctx.getText())
         if self.Context['stage'] == 1:
-            self.MemPointer += 1
+            self.Programs[self.nProgs]['MemPointer'] += 1
         else:
             self.add("NOP")
 
@@ -87,7 +124,7 @@ class Sem(mvasmListener):
     def enterInstrST(self, ctx: mvasmParser.InstrSTContext):
         logger.info(ctx.getText())
         if self.Context['stage'] == 1:
-            self.MemPointer += 3
+            self.Programs[self.nProgs]['MemPointer'] += 3
         else:
             self.add("ST")
 
@@ -99,7 +136,7 @@ class Sem(mvasmListener):
     def enterInstrMOV(self, ctx: mvasmParser.InstrMOVContext):
         logger.info(ctx.getText())
         if self.Context['stage'] == 1:
-            self.MemPointer += 3
+            self.Programs[self.nProgs]['MemPointer'] += 3
         else:
             self.add("MOV")
 
@@ -111,7 +148,7 @@ class Sem(mvasmListener):
     def enterInstrPSH(self, ctx: mvasmParser.InstrPSHContext):
         logger.info(ctx.getText())
         if self.Context['stage'] == 1:
-            self.MemPointer += 2
+            self.Programs[self.nProgs]['MemPointer'] += 2
         else:
             self.add("PSH")
 
@@ -123,7 +160,7 @@ class Sem(mvasmListener):
     def enterInstrPOP(self, ctx: mvasmParser.InstrPOPContext):
         logger.info(ctx.getText())
         if self.Context['stage'] == 1:
-            self.MemPointer += 2
+            self.Programs[self.nProgs]['MemPointer'] += 2
         else:
             self.add("POP")
 
@@ -135,7 +172,7 @@ class Sem(mvasmListener):
     def enterInstrINC(self, ctx:mvasmParser.InstrINCContext):
         logger.info(ctx.getText())
         if self.Context['stage'] == 1:
-            self.MemPointer += 2
+            self.Programs[self.nProgs]['MemPointer'] += 2
         else:
             self.add("INC")
 
@@ -148,7 +185,7 @@ class Sem(mvasmListener):
     def enterInstrDEC(self, ctx:mvasmParser.InstrDECContext):
         logger.info(ctx.getText())
         if self.Context['stage'] == 1:
-            self.MemPointer += 2
+            self.Programs[self.nProgs]['MemPointer'] += 2
         else:
             self.add("DEC")
 
@@ -226,7 +263,7 @@ class Sem(mvasmListener):
     def enterInstrADD(self, ctx: mvasmParser.InstrADDContext):
         logger.info(ctx.getText())
         if self.Context['stage'] == 1:
-            self.MemPointer += 3
+            self.Programs[self.nProgs]['MemPointer'] += 3
         else:
             self.add("ADD")
 
@@ -238,7 +275,7 @@ class Sem(mvasmListener):
     def enterInstrSRCF(self, ctx: mvasmParser.InstrSRCFContext):
         logger.info(ctx.getText())
         if self.Context['stage'] == 1:
-            self.MemPointer += 1
+            self.Programs[self.nProgs]['MemPointer'] += 1
         else:
             self.add("SRCF")
 
@@ -250,7 +287,7 @@ class Sem(mvasmListener):
     def enterInstrWLKT(self, ctx: mvasmParser.InstrWLKTContext):
         logger.info(ctx.getText())
         if self.Context['stage'] == 1:
-            self.MemPointer += 1
+            self.Programs[self.nProgs]['MemPointer'] += 1
         else:
             self.add("WLKT")
 
@@ -262,7 +299,7 @@ class Sem(mvasmListener):
     def enterInstrwlkW(self, ctx: mvasmParser.InstrwlkWContext):
         logger.info(ctx.getText())
         if self.Context['stage'] == 1:
-            self.MemPointer += 1
+            self.Programs[self.nProgs]['MemPointer'] += 1
         else:
             self.add("WLKw")
 
@@ -274,7 +311,7 @@ class Sem(mvasmListener):
     def enterInstrWLK(self, ctx: mvasmParser.InstrWLKContext):
         logger.info(ctx.getText())
         if self.Context['stage'] == 1:
-            self.MemPointer += 2
+            self.Programs[self.nProgs]['MemPointer'] += 2
         else:
             self.add("WLK")
 
@@ -286,7 +323,7 @@ class Sem(mvasmListener):
     def enterInstrJMP(self, ctx: mvasmParser.InstrJMPContext):
         logger.info(ctx.getText())
         if self.Context['stage'] == 1:
-            self.MemPointer += 2
+            self.Programs[self.nProgs]['MemPointer'] += 2
         else:
             self.add("JMP")
             dir = ctx.stop.text
@@ -300,7 +337,7 @@ class Sem(mvasmListener):
     def enterInstrJMPF(self, ctx: mvasmParser.InstrJMPFContext):
         logger.info(ctx.getText())
         if self.Context['stage'] == 1:
-            self.MemPointer += 2
+            self.Programs[self.nProgs]['MemPointer'] += 2
         else:
             self.add("JMPF")
 
@@ -312,7 +349,7 @@ class Sem(mvasmListener):
     def enterInstrJMPB(self, ctx: mvasmParser.InstrJMPBContext):
         logger.info(ctx.getText())
         if self.Context['stage'] == 1:
-            self.MemPointer += 2
+            self.Programs[self.nProgs]['MemPointer'] += 2
         else:
             self.add("JMPB")
 
@@ -324,7 +361,7 @@ class Sem(mvasmListener):
     def enterInstrJZ(self, ctx:mvasmParser.InstrJZContext):
         logger.info(ctx.getText())
         if self.Context['stage'] == 1:
-            self.MemPointer += 3
+            self.Programs[self.nProgs]['MemPointer'] += 3
         else:
             self.add("JZ")
             dir = ctx.stop.text
@@ -340,7 +377,7 @@ class Sem(mvasmListener):
     def enterInstrJNZ(self, ctx:mvasmParser.InstrJNZContext):
         logger.info(ctx.getText())
         if self.Context['stage'] == 1:
-            self.MemPointer += 3
+            self.Programs[self.nProgs]['MemPointer'] += 3
         else:
             self.add("JNZ")
             dir = ctx.stop.text

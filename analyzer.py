@@ -21,14 +21,14 @@ class Analyzer():
         self.Stage=0
         self.seq=None
         self.Context={}
-        self.Context['program']=None
+        self.Context['program']={}
         self.Context['stage']=0
 
         lexer = mvasmLexer(stream)
         tokens = antlr4.CommonTokenStream(lexer)
         parser = mvasmParser(tokens)
 
-        self.Tree=parser.program()
+        self.Tree=parser.programs()
         self.Walker=ParseTreeWalker()
 
 

@@ -15,20 +15,19 @@ class World:
     def add_bug(self,B):
         self.Bugs.append(B)
 
-    # progs is a list with program names
+    # progs is a filename
     # Creates the bug and adds it to the world in a random cell
-    def spawn_bug(self,progs):
+    def spawn_bug(self,prog):
         c=self.Board.get_rand_cell()
         B=Bug(c)
-        B.load_files(progs)
+        B.load_file(prog)
         self.Bugs.append(B)
 
     # Executes a step on each bug
     def step(self):
         for b in self.Bugs:
             r=b.step()
-            if not r:
-                b.activate()
+
 
     def go(self):
         while(1):

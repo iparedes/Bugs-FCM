@@ -8,7 +8,16 @@ class FCM:
         self.Concepts['names']=[]
         self.Edges = np.array([[]])
 
-    def add_concept(self,val=None):
+
+    def cadena(self):
+        s=""
+        for (n,v) in zip(self.Concepts['names'],self.Concepts['values'][0]):
+            s+=n+': '+str(v)+'\n\n'
+        s+=str(self.Edges)
+        return s
+
+    # returns the index of the added concept
+    def add_concept(self,val=None,name=None):
         if val==None:
             val=np.random.rand()
         last=self.Concepts['values'].size
@@ -26,7 +35,10 @@ class FCM:
             # Creates a new row for the edges
             row=np.zeros([1,rows+1])
             self.Edges=np.append(self.Edges,row,axis=0)
-        self.Concepts['names'].append("C"+str(last+1))
+        if not name:
+            name="C"+str(last+1)
+        self.Concepts['names'].append(name)
+        return last
 
     def set_edge(self,i,j,val=None):
         if val==None:
@@ -72,13 +84,15 @@ class FCM:
         return z
 
     # Updates the values of the concepts according to the edges
-    # Returns the index of the biggest concept
     def update_concepts_values(self):
         for i in range(0,self.Concepts['values'].size):
             col=self.Edges[:,i]
             dotprod=self.Concepts['values'].dot(col)
             oldconcept=self.get_concept_value(i)
             self.set_concept_value(i, self.activation(oldconcept + dotprod))
+
+    # Returns the index of the largest concept
+    def max_concept(self):
         return self.Concepts['values'][0].argmax()
 
 

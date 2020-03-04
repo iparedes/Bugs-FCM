@@ -7,9 +7,9 @@ import tools
 tools.init_tools()
 
 
-from FCM import *
-
-
+# from FCM import *
+#
+#
 # F=FCM()
 # F.add_concept()
 # F.add_concept()
@@ -100,11 +100,10 @@ from FCM import *
 
 
 W=World()
-progs=["eat.asm","test.asm"]
-W.spawn_bug(progs)
-W.spawn_bug(progs)
+prog="test2.asm"
+W.spawn_bug(prog)
 for b in W.Bugs:
-    b.activate()
+    b.step()
 
 while (1):
     W.step()
